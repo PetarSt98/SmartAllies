@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -185,14 +186,19 @@ public class ChatOrchestrationService {
 
     private ChatResponse handleReportConfirmation(ConversationContext context, ChatRequest request) {
         String userResponse = request.getMessage().toLowerCase().trim();
+        boolean affirmative = llmService.isAffirmativeReply(userResponse);
         
-        if (userResponse.contains("yes") || userResponse.contains("help")) {
+        if (affirmative) {
             context.setWorkflowState(WorkflowState.COLLECTING_DETAILS);
             contextService.updateContext(context);
+
+            String detailsPrompt = PromptTemplates.buildDetailsCollectionPrompt(
+                    context.getInitialMessage()
+            );
+            String llmResponse = llmService.generateResponse(detailsPrompt);
             
             return ChatResponse.builder()
-                    .message("I'll help you document this. Let me gather the necessary information.\n\n" +
-                            "First, can you tell me who was involved?")
+                    .message(llmResponse)
                     .incidentType(context.getIncidentType())
                     .workflowState(context.getWorkflowState())
                     .metadata(Map.of("requiredFields", Arrays.asList("who", "what", "when", "where")))
@@ -230,8 +236,7 @@ public class ChatOrchestrationService {
         });
         
         String responseMessage = jsonResponse.get("message").asText();
-        boolean allFieldsCollected = jsonResponse.has("allFieldsCollected") && 
-                                     jsonResponse.get("allFieldsCollected").asBoolean();
+        boolean allFieldsCollected = Stream.of("what", "where").allMatch(context::hasField);
         
         if (allFieldsCollected) {
             context.setWorkflowState(WorkflowState.REPORT_READY);
@@ -370,14 +375,12 @@ public class ChatOrchestrationService {
         
         if (hasLocation && context.hasField("location")) {
             log.warn("EMERGENCY ALERT: Location confirmed - {}", context.getField("location"));
-            
+            context.setWorkflowState(WorkflowState.ALERT_SENT);
+
             String alertMessage = String.format("""
                     ✅ Emergency alert sent to company Samaritans!
                     Location: %s
-                    
                     Help is on the way. Please stay calm.
-                    
-                    Can you provide the name of the person who needs assistance?
                     """, context.getField("location"));
             
             return ChatResponse.builder()

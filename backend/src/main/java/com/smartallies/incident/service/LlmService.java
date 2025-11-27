@@ -1,11 +1,18 @@
 package com.smartallies.incident.service;
 
+import static com.smartallies.incident.util.PromptTemplates.SYSTEM_PROMPT;
+
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartallies.incident.model.IncidentClassification;
 import com.smartallies.incident.model.IncidentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
@@ -22,7 +29,10 @@ public class LlmService {
         log.debug("Generating LLM response for prompt length: {}", prompt.length());
         
         try {
-            Prompt aiPrompt = new Prompt(prompt);
+            Prompt aiPrompt = new Prompt(List.of(
+                    new SystemMessage(SYSTEM_PROMPT),
+                    new UserMessage(prompt)
+            ));
             String response = chatModel.call(aiPrompt).getResult().getOutput().getContent();
             log.debug("LLM response received: {}", response.substring(0, Math.min(100, response.length())));
             return response;
