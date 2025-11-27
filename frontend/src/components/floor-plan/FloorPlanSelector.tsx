@@ -4,20 +4,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { FloorPlanPin } from '@/types/incident.types';
 
-type Floor = 'ground' | 'first' | 'second' | 'third';
+type Floor = 'minusOne' | 'minusTwo' | 'minusThree' | 'ground' | 'first' | 'second' | 'third';
 
 interface FloorPlanSelectorProps {
   onLocationSelect: (location: string) => void;
 }
 
 const FLOOR_IMAGES: Record<Floor, string> = {
-  ground: '/images/floor-plans/ground-floor.png',
-  first: '/images/floor-plans/first-floor.png',
-  second: '/images/floor-plans/second-floor.png',
-  third: '/images/floor-plans/third-floor.png',
+  minusThree: '/images/floor-plans/minus-three.svg',
+  minusTwo: '/images/floor-plans/minus-two.svg',
+  minusOne: '/images/floor-plans/minus-one.svg',
+  ground: '/images/floor-plans/ground-floor.svg',
+  first: '/images/floor-plans/first-floor.svg',
+  second: '/images/floor-plans/second-floor.svg',
+  third: '/images/floor-plans/third-floor.svg',
 };
 
 const FLOOR_LABELS: Record<Floor, string> = {
+  minusThree: '-3',
+  minusTwo: '-2',
+  minusOne: '-1',
   ground: 'Ground',
   first: '1st',
   second: '2nd',
@@ -39,7 +45,7 @@ export function FloorPlanSelector({ onLocationSelect }: FloorPlanSelectorProps) 
   const handleConfirm = () => {
     if (pin) {
       onLocationSelect(
-        `Floor plan location: ${FLOOR_LABELS[selectedFloor]} Floor, X: ${pin.x.toFixed(1)}%, Y: ${pin.y.toFixed(1)}%`
+        `Floor plan location: ${FLOOR_LABELS[selectedFloor]}, X: ${pin.x.toFixed(1)}%, Y: ${pin.y.toFixed(1)}%`
       );
     }
   };
@@ -65,7 +71,7 @@ export function FloorPlanSelector({ onLocationSelect }: FloorPlanSelectorProps) 
               variant={selectedFloor === floor ? 'default' : 'outline'}
               onClick={() => handleFloorChange(floor)}
             >
-              {FLOOR_LABELS[floor]} Floor
+              {FLOOR_LABELS[floor]}
             </Button>
           ))}
         </div>
@@ -80,9 +86,6 @@ export function FloorPlanSelector({ onLocationSelect }: FloorPlanSelectorProps) 
             backgroundRepeat: 'no-repeat',
           }}
         >
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-            {!pin && <p>Click anywhere to pin the incident location</p>}
-          </div>
           {pin && (
             <div
               className="absolute transform -translate-x-1/2 -translate-y-full"
