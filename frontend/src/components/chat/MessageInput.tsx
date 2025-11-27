@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { Send, Paperclip, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { apiService } from '@/services/api.service';
 
 interface MessageInputProps {
   onSendMessage: (message: string, imageUrl?: string) => void;
@@ -16,21 +15,14 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() && !selectedImage) return;
 
-    let imageUrl: string | undefined;
+    const imageUrl = imagePreview ?? undefined;
+    const content = message.trim() || 'Image attached';
 
-    if (selectedImage) {
-      try {
-        imageUrl = await apiService.uploadImage(selectedImage);
-      } catch (error) {
-        console.error('Image upload failed:', error);
-      }
-    }
-
-    onSendMessage(message.trim(), imageUrl);
+    onSendMessage(content, imageUrl);
     setMessage('');
     setSelectedImage(null);
     setImagePreview(null);
