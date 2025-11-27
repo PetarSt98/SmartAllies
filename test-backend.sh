@@ -7,6 +7,9 @@ echo "╔═══════════════════════�
 echo "║   SmartAllies Incident Reporting Backend - Quick Start        ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 echo ""
+echo "ℹ️  Note: This project uses a remote Ollama host"
+echo "   Make sure application.properties is configured correctly"
+echo ""
 
 # Check if backend is running
 if ! curl -s http://localhost:8080/api/health > /dev/null 2>&1; then

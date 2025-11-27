@@ -54,10 +54,9 @@ Before running, ensure you have:
    brew install maven
    ```
 
-3. **Ollama**
-   ```bash
-   brew install ollama
-   ```
+3. **Remote Ollama Host Access**
+   - You have a remote Ollama host configured
+   - Update `backend/src/main/resources/application.properties` with your host URL
 
 ---
 

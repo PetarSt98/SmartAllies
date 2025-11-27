@@ -3,6 +3,9 @@
 ## Core Principles
 Write code that prioritizes **human readability and maintainability** over cleverness. Every line should be self-explanatory to developers joining the project.
 
+## ⚠️ Important: No Markdown Planning Documents
+**Do not create markdown files for planning, notes, or tracking—work in memory instead.** Only create a markdown file when the user explicitly asks for that specific file by name or path.
+
 ---
 
 ## Code Style Guidelines

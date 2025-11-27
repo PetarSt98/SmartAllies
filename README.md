@@ -51,12 +51,15 @@ Build a chatbot that helps employees report three types of incidents:
    ```bash
    # Java 17+
    brew install openjdk@17
-   
-   # Ollama
-   brew install ollama
    ```
 
-2. **Start Backend:**
+2. **Configure Remote Ollama:**
+   Edit `backend/src/main/resources/application.properties`:
+   ```properties
+   spring.ai.ollama.base-url=http://your-ollama-host:11434
+   ```
+
+3. **Start Backend:**
    ```bash
    cd backend
    ./start.sh
@@ -64,11 +67,10 @@ Build a chatbot that helps employees report three types of incidents:
    
    This script will:
    - Check dependencies
-   - Start Ollama service
-   - Pull llama3.2 model
    - Build and run Spring Boot app
+   - Connect to remote Ollama host
 
-3. **Test API:**
+4. **Test API:**
    ```bash
    curl http://localhost:8080/api/health
    ```
@@ -293,8 +295,9 @@ All developers should:
 ## 📞 Support
 
 **Backend Issues:**
-- Check Ollama is running: `ollama serve`
-- Verify model: `ollama list | grep llama3.2`
+- Check remote Ollama host is accessible
+- Test connection: `curl http://your-ollama-host:11434/api/tags`
+- Verify base URL in application.properties
 - Review logs: `tail -f logs/application.log`
 
 **Common Issues:**
