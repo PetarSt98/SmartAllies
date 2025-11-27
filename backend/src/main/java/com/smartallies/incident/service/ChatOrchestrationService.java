@@ -81,9 +81,10 @@ public class ChatOrchestrationService {
     private ChatResponse handleClassificationConfirmation(ConversationContext context, ChatRequest request) {
         log.info("Handling classification confirmation for session: {}", request.getSessionId());
         
-        String userResponse = request.getMessage().toLowerCase().trim();
-        
-        if (userResponse.contains("yes") || userResponse.contains("correct") || userResponse.contains("right")) {
+        String userResponse = request.getMessage();
+        boolean affirmative = llmService.isAffirmativeReply(userResponse);
+
+        if (affirmative) {
             context.setWorkflowState(WorkflowState.CLASSIFICATION_CONFIRMED);
             contextService.updateContext(context);
             
