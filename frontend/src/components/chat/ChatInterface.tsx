@@ -1,16 +1,24 @@
+import { useState } from 'react';
 import { useChatWorkflow } from '@/hooks/useChatWorkflow';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { ActionButtons } from './ActionButtons';
 import { FloorPlanSelector } from '@/components/floor-plan/FloorPlanSelector';
-import { IncidentType } from '@/types/incident.types';
+import { SubmitReportDialog } from '@/components/report/SubmitReportDialog';
+import { IncidentType, WorkflowState } from '@/types/incident.types';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export function ChatInterface() {
-  const { messages, isLoading, currentResponse, sendMessage } = useChatWorkflow();
+  const { messages, isLoading, currentResponse, sendMessage, sessionId } = useChatWorkflow();
+  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
 
   const handleActionClick = (action: string) => {
-    sendMessage(action);
+    if (action.toLowerCase().includes('submit')) {
+      setShowSubmitDialog(true);
+    } else {
+      sendMessage(action);
+    }
   };
 
   const handleLocationSelect = (location: string) => {
@@ -23,36 +31,57 @@ export function ChatInterface() {
     Array.isArray(currentResponse.metadata.requiredFields) &&
     (currentResponse.metadata.requiredFields as string[]).includes('where');
 
+  const canSubmit =
+    currentResponse?.workflowState === WorkflowState.REPORT_READY &&
+    (currentResponse?.incidentType === IncidentType.HUMAN ||
+      currentResponse?.incidentType === IncidentType.FACILITY);
+
   return (
-    <div className="h-screen flex flex-col">
-      <header className="bg-primary text-white p-4 shadow-md flex items-center gap-3 w-full">
-        <img
-          src="/images/logo/SQ.svg"
-          alt="SmartAllies logo"
-          className="h-8 w-8"
-        />
+    <div className="h-screen flex flex-col max-w-4xl mx-auto">
+      <header className="bg-primary text-white p-4 shadow-md">
         <h1 className="text-xl font-semibold">SmartAllies Incident Reporting</h1>
       </header>
 
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
-        <Card className="flex-1 flex flex-col m-4 overflow-hidden">
-          <MessageList messages={messages} />
+      <Card className="flex-1 flex flex-col m-4 overflow-hidden">
+        <MessageList messages={messages} />
 
-          {showFloorPlan ? (
-            <div className="p-4 border-t">
-              <FloorPlanSelector onLocationSelect={handleLocationSelect} />
+        {showFloorPlan ? (
+          <div className="p-4 border-t">
+            <FloorPlanSelector onLocationSelect={handleLocationSelect} />
+          </div>
+        ) : null}
+
+        <ActionButtons
+          response={currentResponse}
+          onActionClick={handleActionClick}
+          isLoading={isLoading}
+        />
+
+        {canSubmit && (
+          <div className="border-t p-4 bg-gray-50">
+            <div className="flex gap-3 justify-center">
+              <Button variant="outline" onClick={() => sendMessage('Cancel')}>
+                Cancel
+              </Button>
+              <Button variant="outline" onClick={() => setShowSubmitDialog(true)}>
+                Submit Anonymously
+              </Button>
+              <Button onClick={() => setShowSubmitDialog(true)}>
+                Submit Report
+              </Button>
             </div>
-          ) : null}
+          </div>
+        )}
 
-          <ActionButtons
-            response={currentResponse}
-            onActionClick={handleActionClick}
-            isLoading={isLoading}
-          />
+        <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
+      </Card>
 
-          <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
-        </Card>
-      </div>
+      {showSubmitDialog && (
+        <SubmitReportDialog
+          sessionId={sessionId}
+          onCancel={() => setShowSubmitDialog(false)}
+        />
+      )}
     </div>
   );
 }
