@@ -1,14 +1,15 @@
 import { useState } from 'react';
 
-import { useChatWorkflow } from '@/hooks/useChatWorkflow';
-import { MessageList } from './MessageList';
-import { MessageInput } from './MessageInput';
-import { ActionButtons } from './ActionButtons';
 import { FloorPlanSelector } from '@/components/floor-plan/FloorPlanSelector';
-import { IncidentType, WorkflowState } from '@/types/incident.types';
-import { Card } from '@/components/ui/card';
+import { SubmitReportDialog } from '@/components/report/SubmitReportDialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { useChatWorkflow } from '@/hooks/useChatWorkflow';
+import { IncidentType, WorkflowState } from '@/types/incident.types';
+
+import { ActionButtons } from './ActionButtons';
+import { MessageInput } from './MessageInput';
+import { MessageList } from './MessageList';
 
 type SubmitIntent = 'submit' | 'anonymous' | null;
 
@@ -16,20 +17,15 @@ export function ChatInterface() {
   const { messages, isLoading, currentResponse, sendMessage, sessionId } = useChatWorkflow();
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [submitIntent, setSubmitIntent] = useState<SubmitIntent>(null);
-  const [fullName, setFullName] = useState('');
-  const [nameError, setNameError] = useState('');
 
   const openSubmitDialog = (intent: SubmitIntent = 'submit') => {
     setSubmitIntent(intent);
     setShowSubmitDialog(true);
-    setNameError('');
   };
 
   const closeSubmitDialog = () => {
     setShowSubmitDialog(false);
     setSubmitIntent(null);
-    setFullName('');
-    setNameError('');
   };
 
   const handleActionClick = (action: string) => {
@@ -69,23 +65,6 @@ export function ChatInterface() {
       currentResponse?.incidentType === IncidentType.FACILITY);
 
   const submitSummary = (currentResponse?.metadata as { summary?: string } | undefined)?.summary;
-
-  const handleConfirmSubmit = async () => {
-    if (submitIntent === 'anonymous') {
-      await sendMessage('Submit Anonymously');
-      closeSubmitDialog();
-      return;
-    }
-
-    if (!fullName.trim()) {
-      setNameError('Please provide your full name to submit.');
-      return;
-    }
-
-    await sendMessage('Submit');
-    await sendMessage(fullName.trim());
-    closeSubmitDialog();
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-100 text-slate-900">
@@ -164,78 +143,12 @@ export function ChatInterface() {
       </div>
 
       {showSubmitDialog ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 px-4 py-6 backdrop-blur-sm">
-          <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-orange-100/80 bg-white/95 shadow-2xl">
-            <div className="border-b border-orange-100/70 bg-gradient-to-r from-orange-50 to-white px-6 py-4">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-orange-600">Submit report</p>
-                  <p className="text-base font-semibold text-slate-900">Confirm details before sending</p>
-                </div>
-                <span className="rounded-full bg-orange-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-orange-700 ring-1 ring-orange-200">
-                  Session {sessionId.slice(-6)}
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-4 px-6 py-5">
-              {submitSummary ? (
-                <div className="rounded-xl border border-orange-100/80 bg-orange-50/50 p-3 text-sm text-orange-900">
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-orange-700">Summary</p>
-                  <p className="leading-relaxed">{submitSummary}</p>
-                </div>
-              ) : null}
-
-              {submitIntent === 'submit' ? (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-900" htmlFor="reporter-name">
-                    Full name
-                  </label>
-                  <Input
-                    id="reporter-name"
-                    placeholder="Enter your full name"
-                    value={fullName}
-                    onChange={(event) => {
-                      setFullName(event.target.value);
-                      setNameError('');
-                    }}
-                    className="border-orange-200 focus-visible:ring-orange-500"
-                  />
-                  {nameError ? <p className="text-xs font-semibold text-red-600">{nameError}</p> : null}
-                </div>
-              ) : (
-                <div className="rounded-xl border border-orange-100/80 bg-orange-50/60 px-3 py-2 text-sm text-orange-800">
-                  This report will be sent without your name.
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-2 border-t border-orange-100/80 bg-orange-50/60 px-6 py-4 sm:flex-row sm:justify-end">
-              <Button
-                variant="outline"
-                onClick={closeSubmitDialog}
-                className="border-orange-200 text-orange-700 hover:bg-orange-100/70"
-              >
-                Go Back
-              </Button>
-              {submitIntent === 'submit' ? (
-                <Button
-                  onClick={handleConfirmSubmit}
-                  className="bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-[0_10px_30px_rgba(249,91,53,0.25)] hover:brightness-105"
-                >
-                  Submit with Name
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleConfirmSubmit}
-                  className="bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-[0_10px_30px_rgba(249,91,53,0.25)] hover:brightness-105"
-                >
-                  Submit Anonymously
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
+        <SubmitReportDialog
+          sessionId={sessionId}
+          summary={submitSummary}
+          defaultMode={submitIntent === 'anonymous' ? 'anonymous' : 'identified'}
+          onCancel={closeSubmitDialog}
+        />
       ) : null}
     </div>
   );
