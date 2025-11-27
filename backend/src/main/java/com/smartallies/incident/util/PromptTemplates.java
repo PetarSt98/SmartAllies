@@ -6,13 +6,15 @@ import java.util.Map;
 
 public class PromptTemplates {
 
+    public static final String SYSTEM_PROMPT = "You are an HR assistant that answers concisely and uses an empathetic and understanding tone.";
+
     private static final String CLASSIFICATION_PROMPT_V1 = """
             You are an incident classifier for a workplace safety system.
             Analyze the following message and classify it as one of these incident types:
             
-            - HUMAN: Harassment, discrimination, bullying, mental health issues, interpersonal conflicts, workplace behavior concerns
+            - HUMAN: Harassment, discrimination, bullying, interpersonal conflicts, workplace behavior concerns
             - FACILITY: Equipment damage, maintenance issues, physical hazards, broken infrastructure, building problems
-            - EMERGENCY: Immediate danger, medical emergency, fire, security threat, life-threatening situations
+            - EMERGENCY: Immediate danger, medical emergency and issue, mental health issues, fire, security threat, life-threatening situations
             
             Message: {message}
             Has attached image: {hasImage}
@@ -26,36 +28,53 @@ public class PromptTemplates {
             """;
 
     private static final String HUMAN_INCIDENT_DETAILS_PROMPT = """
+            You are a supportive HR assistant helping an employee report a sensitive human-related incident.
+            Use an empathetic, calm, and understanding tone at all times.
+            
+            Current conversation context:
+            Initial incident: {initialMessage}
+            
+            The user needs to provide these details:
+            - What: Detailed description of what happened
+            - When: Date and time of the incident
+            - Where: Location where it occurred
+            - Who: Person/people involved in causing the incident
+            
+            Already collected fields: {collectedFields}
+            
+            User's latest message: {userMessage}
+            
+            Extract any information from the user's previous messages that fills in the missing fields.
+            Then respond with helpful guidance to collect any mandatory remaining information.
+            Never pressure the user, but guide them clearly and compassionately.
+            
+            Respond ONLY with valid JSON:
+            {
+              "extractedFields": {
+                "what": "extracted value or null",
+                "when": "extracted value or null",
+                "where": "extracted value or null",
+                "who": "extracted value or null"
+              },
+              "message": "Your empathetic response asking for missing information",
+              "allFieldsCollected": "true if and only if the mandatory fields (what, when, where) are all provided; otherwise false.",
+            }
+            """;
+
+    private static final String HUMAN_INCIDENT_COLLECTING_DETAILS_PROMPT = """
             You are a supportive HR assistant helping someone report a human incident.
             Use an empathetic and understanding tone.
             
             Current conversation context:
             Initial incident: {initialMessage}
             
-            The user needs to provide these mandatory details:
-            - Who: Person/people involved in causing the incident
+            The user needs to provide these details:
             - What: Detailed description of what happened
             - When: Date and time of the incident
             - Where: Location where it occurred
+            - Who: Person/people involved in causing the incident
             
-            Already collected fields: {collectedFields}
-            
-            User's latest message: {userMessage}
-            
-            Extract any information from the user's message that fills in the missing fields.
-            Then respond with helpful guidance to collect any remaining information.
-            
-            Respond ONLY with valid JSON:
-            {
-              "extractedFields": {
-                "who": "extracted value or null",
-                "what": "extracted value or null",
-                "when": "extracted value or null",
-                "where": "extracted value or null"
-              },
-              "message": "Your empathetic response asking for missing information",
-              "allFieldsCollected": true or false
-            }
+            Respond ONLY with a follow-up question to ask the user in order to get the details.
             """;
 
     private static final String FACILITY_INCIDENT_DETAILS_PROMPT = """
@@ -134,6 +153,10 @@ public class PromptTemplates {
                 .replace("{initialMessage}", initialMessage)
                 .replace("{collectedFields}", collectedFields.toString())
                 .replace("{userMessage}", userMessage);
+    }
+
+    public static String buildDetailsCollectionPrompt(String initialMessage) {
+        return HUMAN_INCIDENT_COLLECTING_DETAILS_PROMPT.replace("{initialMessage}", initialMessage);
     }
 
     public static String buildReportSummaryPrompt(

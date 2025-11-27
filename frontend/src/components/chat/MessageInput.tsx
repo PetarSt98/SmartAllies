@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { Send, Paperclip, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { apiService } from '@/services/api.service';
 
 interface MessageInputProps {
   onSendMessage: (message: string, imageUrl?: string) => void;
@@ -16,21 +15,14 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() && !selectedImage) return;
 
-    let imageUrl: string | undefined;
+    const imageUrl = imagePreview ?? undefined;
+    const content = message.trim() || 'Image attached';
 
-    if (selectedImage) {
-      try {
-        imageUrl = await apiService.uploadImage(selectedImage);
-      } catch (error) {
-        console.error('Image upload failed:', error);
-      }
-    }
-
-    onSendMessage(message.trim(), imageUrl);
+    onSendMessage(content, imageUrl);
     setMessage('');
     setSelectedImage(null);
     setImagePreview(null);
@@ -56,24 +48,27 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-t p-4 bg-white">
+    <form onSubmit={handleSubmit} className="border-t border-orange-100/80 bg-white/90 px-4 py-5">
       {imagePreview && (
-        <div className="mb-2 relative inline-block">
+        <div className="mb-3 inline-flex items-center gap-3 rounded-xl border border-orange-100 bg-orange-50/60 p-2 pr-3 shadow-inner">
           <img
             src={imagePreview}
             alt="Preview"
-            className="h-20 w-20 object-cover rounded-md"
+            className="h-16 w-16 rounded-lg object-cover ring-1 ring-orange-200"
           />
-          <button
-            type="button"
-            onClick={removeImage}
-            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-          >
-            ×
-          </button>
+          <div className="flex flex-col gap-1 text-sm text-orange-800">
+            <span className="font-semibold">Attached image</span>
+            <button
+              type="button"
+              onClick={removeImage}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-orange-700 underline-offset-2 hover:underline"
+            >
+              Remove
+            </button>
+          </div>
         </div>
       )}
-      <div className="flex gap-2">
+      <div className="flex items-center gap-3 rounded-2xl border border-orange-100/80 bg-white/90 px-3 py-2 shadow-sm ring-1 ring-orange-50">
         <input
           ref={fileInputRef}
           type="file"
@@ -95,6 +90,7 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           size="icon"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
+          className="border-orange-200 text-orange-700 hover:bg-orange-50"
         >
           <Paperclip className="h-4 w-4" />
         </Button>
@@ -104,17 +100,22 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           size="icon"
           onClick={() => cameraInputRef.current?.click()}
           disabled={isLoading}
+          className="border-orange-200 text-orange-700 hover:bg-orange-50"
         >
           <Camera className="h-4 w-4" />
         </Button>
         <Input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message..."
+          placeholder="Share details, attach a photo, or ask for help..."
           disabled={isLoading}
-          className="flex-1"
+          className="flex-1 border-none bg-transparent text-base placeholder:text-orange-700/60 focus-visible:ring-orange-300"
         />
-        <Button type="submit" disabled={isLoading || (!message.trim() && !selectedImage)}>
+        <Button
+          type="submit"
+          disabled={isLoading || (!message.trim() && !selectedImage)}
+          className="shadow-[0_10px_30px_rgba(249,91,53,0.35)]"
+        >
           <Send className="h-4 w-4" />
         </Button>
       </div>

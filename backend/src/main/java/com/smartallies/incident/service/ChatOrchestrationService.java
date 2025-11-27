@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -36,6 +37,8 @@ public class ChatOrchestrationService {
             case CLASSIFICATION_CONFIRMED -> handlePostClassificationActions(context, request);
             case COLLECTING_DETAILS -> handleDetailsCollection(context, request);
             case AWAITING_REPORT_CONFIRMATION -> handleReportConfirmation(context, request);
+            case REPORT_READY -> handleReportSubmission(context, request);
+            case AWAITING_REPORTER_DETAILS -> handleReporterDetails(context, request);
             case EMERGENCY_ACTIVE -> handleEmergencyFlow(context, request);
             default -> buildErrorResponse("Invalid workflow state");
         };
@@ -183,14 +186,19 @@ public class ChatOrchestrationService {
 
     private ChatResponse handleReportConfirmation(ConversationContext context, ChatRequest request) {
         String userResponse = request.getMessage().toLowerCase().trim();
+        boolean affirmative = llmService.isAffirmativeReply(userResponse);
         
-        if (userResponse.contains("yes") || userResponse.contains("help")) {
+        if (affirmative) {
             context.setWorkflowState(WorkflowState.COLLECTING_DETAILS);
             contextService.updateContext(context);
+
+            String detailsPrompt = PromptTemplates.buildDetailsCollectionPrompt(
+                    context.getInitialMessage()
+            );
+            String llmResponse = llmService.generateResponse(detailsPrompt);
             
             return ChatResponse.builder()
-                    .message("I'll help you document this. Let me gather the necessary information.\n\n" +
-                            "First, can you tell me who was involved?")
+                    .message(llmResponse)
                     .incidentType(context.getIncidentType())
                     .workflowState(context.getWorkflowState())
                     .metadata(Map.of("requiredFields", Arrays.asList("who", "what", "when", "where")))
@@ -228,8 +236,7 @@ public class ChatOrchestrationService {
         });
         
         String responseMessage = jsonResponse.get("message").asText();
-        boolean allFieldsCollected = jsonResponse.has("allFieldsCollected") && 
-                                     jsonResponse.get("allFieldsCollected").asBoolean();
+        boolean allFieldsCollected = Stream.of("what", "where").allMatch(context::hasField);
         
         if (allFieldsCollected) {
             context.setWorkflowState(WorkflowState.REPORT_READY);
@@ -265,6 +272,84 @@ public class ChatOrchestrationService {
                 .build();
     }
 
+    private ChatResponse handleReportSubmission(ConversationContext context, ChatRequest request) {
+        String userResponse = request.getMessage().toLowerCase().trim();
+
+        if (userResponse.contains("anonymous")) {
+            context.setWorkflowState(WorkflowState.COMPLETED);
+            contextService.updateContext(context);
+
+            return ChatResponse.builder()
+                    .message("Your report has been submitted anonymously. Thank you for letting us know.")
+                    .incidentType(context.getIncidentType())
+                    .workflowState(context.getWorkflowState())
+                    .metadata(Map.of(
+                            "summary", context.getField("summary"),
+                            "collectedFields", context.getCollectedFields(),
+                            "submittedAnonymously", true
+                    ))
+                    .build();
+        }
+
+        if (userResponse.contains("cancel")) {
+            context.setWorkflowState(WorkflowState.COMPLETED);
+            contextService.updateContext(context);
+
+            return ChatResponse.builder()
+                    .message("Report submission cancelled. If you need anything else, I'm here to help.")
+                    .incidentType(context.getIncidentType())
+                    .workflowState(context.getWorkflowState())
+                    .build();
+        }
+
+        context.setWorkflowState(WorkflowState.AWAITING_REPORTER_DETAILS);
+        contextService.updateContext(context);
+
+        return ChatResponse.builder()
+                .message("Before I submit this, please provide your full name.")
+                .incidentType(context.getIncidentType())
+                .workflowState(context.getWorkflowState())
+                .suggestedActions(Arrays.asList("Submit Anonymously"))
+                .metadata(Map.of(
+                        "summary", context.getField("summary"),
+                        "collectedFields", context.getCollectedFields()
+                ))
+                .build();
+    }
+
+    private ChatResponse handleReporterDetails(ConversationContext context, ChatRequest request) {
+        String reporterName = request.getMessage().trim();
+
+        if (reporterName.isEmpty()) {
+            return ChatResponse.builder()
+                    .message("I didn't catch a name. Please share your full name or choose to submit anonymously.")
+                    .incidentType(context.getIncidentType())
+                    .workflowState(context.getWorkflowState())
+                    .suggestedActions(Arrays.asList("Submit Anonymously"))
+                    .metadata(Map.of(
+                            "summary", context.getField("summary"),
+                            "collectedFields", context.getCollectedFields()
+                    ))
+                    .build();
+        }
+
+        context.updateField("reporterName", reporterName);
+        context.setWorkflowState(WorkflowState.COMPLETED);
+        contextService.updateContext(context);
+
+        return ChatResponse.builder()
+                .message(String.format("Thank you, %s. Your report has been submitted.", reporterName))
+                .incidentType(context.getIncidentType())
+                .workflowState(context.getWorkflowState())
+                .metadata(Map.of(
+                        "summary", context.getField("summary"),
+                        "collectedFields", context.getCollectedFields(),
+                        "submittedAnonymously", false,
+                        "reporterName", reporterName
+                ))
+                .build();
+    }
+
     private ChatResponse handleEmergencyFlow(ConversationContext context, ChatRequest request) {
         log.warn("Handling emergency flow for session: {}", request.getSessionId());
         
@@ -290,14 +375,12 @@ public class ChatOrchestrationService {
         
         if (hasLocation && context.hasField("location")) {
             log.warn("EMERGENCY ALERT: Location confirmed - {}", context.getField("location"));
-            
+            context.setWorkflowState(WorkflowState.ALERT_SENT);
+
             String alertMessage = String.format("""
                     ✅ Emergency alert sent to company Samaritans!
                     Location: %s
-                    
                     Help is on the way. Please stay calm.
-                    
-                    Can you provide the name of the person who needs assistance?
                     """, context.getField("location"));
             
             return ChatResponse.builder()
