@@ -81,88 +81,43 @@ public class LlmService {
         return trimmed;
     }
 
-    public boolean isAffirmativeReply(String userReply) {
+	public boolean isAffirmativeReply(String userReply) {
 		String trimmedReply = userReply == null ? "" : userReply.trim();
 
 		if (trimmedReply.isEmpty()) {
 			return false;
 		}
 
-		try {
-			String prompt = """
-					You are a classifier that decides whether a short user reply is AFFIRMATIVE or NOT.
-					
-					- AFFIRMATIVE means the user confirms, agrees, or wants to proceed
-					  (e.g. "yes", "yes, that works", "proceed", "I agree", "correct", "that's fine", "go ahead").
-					- NOT AFFIRMATIVE means the user disagrees, rejects, corrects, or wants a change
-					  (e.g. "no", "not really", "that's wrong", "I don't agree", "let's change it", "no, pick another").
-					
-					You must also estimate your confidence in your classification between 0 and 1.
-					
-					Respond ONLY with a JSON object in this exact format:
-					{
-					  "affirmative": true | false,
-					  "confidence": 0.0 - 1.0
-					}
-					
-					Be conservative: if you are not clearly sure it is affirmative,
-					set "affirmative" to false and lower confidence.
-					
-					User reply: "%s"
-					""".formatted(trimmedReply);
+        String prompt = """
+                You are a classifier that decides whether a short user reply is AFFIRMATIVE or NOT.
 
-			String llmResponse = generateResponse(prompt);
-			JsonNode json = parseJsonResponse(llmResponse);
+                - AFFIRMATIVE means the user confirms, agrees, or wants to proceed
+                    (e.g. "yes", "yeah", "yep", "sure", "correct", "right", "agree",
+                    "proceed", "go ahead", "confirm", "confirmed", "alright",
+                    "ok", "okay", "fine", "sounds good", "that's fine", "i would like to proceed",
+                    "let's go", "looks good", "all good",
+                    "indeed", "exactly", "absolutely", "perfect", "that works", "works for me").
+                - NOT AFFIRMATIVE means the user disagrees, rejects, corrects, or wants a change
+                    (e.g. "no", "nope", "nah", "not really", "don't agree", "do not agree",
+                    "wrong", "change", "another", "different", "disagree", "stop",
+                    "cancel", "that's not", "isn't correct", "is not correct",
+                    "no, thanks", "no thanks", "rather not").
 
-			if (json.has("affirmative")) {
-				boolean affirmative = json.get("affirmative").asBoolean();
-				double confidence = json.has("confidence") ? json.get("confidence").asDouble() : 0.0;
+                Respond ONLY with a JSON object in this exact format:
+                { "affirmative": true }  or  { "affirmative": false }
 
-				if (affirmative && confidence >= 0.85) {
-					return true;
-				}
+                User reply: "%s"
+                """.formatted(trimmedReply);
 
-				if (!affirmative && confidence >= 0.85) {
-					return false;
-				}
+        String llmResponse = generateResponse(prompt);
+        JsonNode json = parseJsonResponse(llmResponse);
 
-				return fallbackAffirmativeHeuristic(trimmedReply.toLowerCase());
-			}
+        if (json.has("affirmative")) {
+            return json.get("affirmative").asBoolean();
+        }
 
-			return fallbackAffirmativeHeuristic(trimmedReply.toLowerCase());
-		}
-		catch (Exception e) {
-			log.warn("Falling back to heuristic affirmative detection for reply: {}", trimmedReply, e);
-			return fallbackAffirmativeHeuristic(trimmedReply.toLowerCase());
-		}
-	}
-
-	private boolean fallbackAffirmativeHeuristic(String replyLower) {
-		String[] positiveKeywords = {
-				"yes", "yeah", "yep", "sure", "correct", "right", "agree",
-				"proceed", "go ahead", "confirm", "confirmed", "alright",
-				"ok", "okay", "fine", "sounds good", "that's fine", "i would like to proceed",
-				"let's go", "looks good", "all good"
-		};
-
-		String[] negativeKeywords = {
-				"no", "nope", "nah", "not really", "don't agree", "do not agree",
-				"wrong", "change", "another", "different", "disagree", "stop",
-				"cancel", "that's not", "isn't correct", "is not correct"
-		};
-
-		for (String neg : negativeKeywords) {
-			if (replyLower.contains(neg)) {
-				return false;
-			}
-		}
-
-		for (String pos : positiveKeywords) {
-			if (replyLower.contains(pos)) {
-				return true;
-			}
-		}
-
-		return false;
+        // fallback
+        return false;
+		
 	}
 }
