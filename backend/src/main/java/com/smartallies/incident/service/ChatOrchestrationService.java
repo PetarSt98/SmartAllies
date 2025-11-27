@@ -36,6 +36,8 @@ public class ChatOrchestrationService {
             case CLASSIFICATION_CONFIRMED -> handlePostClassificationActions(context, request);
             case COLLECTING_DETAILS -> handleDetailsCollection(context, request);
             case AWAITING_REPORT_CONFIRMATION -> handleReportConfirmation(context, request);
+            case REPORT_READY -> handleReportSubmission(context, request);
+            case AWAITING_REPORTER_DETAILS -> handleReporterDetails(context, request);
             case EMERGENCY_ACTIVE -> handleEmergencyFlow(context, request);
             default -> buildErrorResponse("Invalid workflow state");
         };
@@ -262,6 +264,84 @@ public class ChatOrchestrationService {
                 .incidentType(context.getIncidentType())
                 .workflowState(context.getWorkflowState())
                 .metadata(Map.of("collectedFields", context.getCollectedFields()))
+                .build();
+    }
+
+    private ChatResponse handleReportSubmission(ConversationContext context, ChatRequest request) {
+        String userResponse = request.getMessage().toLowerCase().trim();
+
+        if (userResponse.contains("anonymous")) {
+            context.setWorkflowState(WorkflowState.COMPLETED);
+            contextService.updateContext(context);
+
+            return ChatResponse.builder()
+                    .message("Your report has been submitted anonymously. Thank you for letting us know.")
+                    .incidentType(context.getIncidentType())
+                    .workflowState(context.getWorkflowState())
+                    .metadata(Map.of(
+                            "summary", context.getField("summary"),
+                            "collectedFields", context.getCollectedFields(),
+                            "submittedAnonymously", true
+                    ))
+                    .build();
+        }
+
+        if (userResponse.contains("cancel")) {
+            context.setWorkflowState(WorkflowState.COMPLETED);
+            contextService.updateContext(context);
+
+            return ChatResponse.builder()
+                    .message("Report submission cancelled. If you need anything else, I'm here to help.")
+                    .incidentType(context.getIncidentType())
+                    .workflowState(context.getWorkflowState())
+                    .build();
+        }
+
+        context.setWorkflowState(WorkflowState.AWAITING_REPORTER_DETAILS);
+        contextService.updateContext(context);
+
+        return ChatResponse.builder()
+                .message("Before I submit this, please provide your full name.")
+                .incidentType(context.getIncidentType())
+                .workflowState(context.getWorkflowState())
+                .suggestedActions(Arrays.asList("Submit Anonymously"))
+                .metadata(Map.of(
+                        "summary", context.getField("summary"),
+                        "collectedFields", context.getCollectedFields()
+                ))
+                .build();
+    }
+
+    private ChatResponse handleReporterDetails(ConversationContext context, ChatRequest request) {
+        String reporterName = request.getMessage().trim();
+
+        if (reporterName.isEmpty()) {
+            return ChatResponse.builder()
+                    .message("I didn't catch a name. Please share your full name or choose to submit anonymously.")
+                    .incidentType(context.getIncidentType())
+                    .workflowState(context.getWorkflowState())
+                    .suggestedActions(Arrays.asList("Submit Anonymously"))
+                    .metadata(Map.of(
+                            "summary", context.getField("summary"),
+                            "collectedFields", context.getCollectedFields()
+                    ))
+                    .build();
+        }
+
+        context.updateField("reporterName", reporterName);
+        context.setWorkflowState(WorkflowState.COMPLETED);
+        contextService.updateContext(context);
+
+        return ChatResponse.builder()
+                .message(String.format("Thank you, %s. Your report has been submitted.", reporterName))
+                .incidentType(context.getIncidentType())
+                .workflowState(context.getWorkflowState())
+                .metadata(Map.of(
+                        "summary", context.getField("summary"),
+                        "collectedFields", context.getCollectedFields(),
+                        "submittedAnonymously", false,
+                        "reporterName", reporterName
+                ))
                 .build();
     }
 
