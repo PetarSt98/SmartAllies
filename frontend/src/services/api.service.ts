@@ -1,5 +1,6 @@
 import { APP_CONFIG } from '@/config/constants';
 import type { ChatRequest, ChatResponse } from '@/types/incident.types';
+import type { IncidentReport, SubmitReportRequest } from '@/types/report.types';
 
 class ApiService {
   private baseUrl = APP_CONFIG.API_BASE_URL;
@@ -35,6 +36,32 @@ class ApiService {
 
     const data = await response.json();
     return data.url;
+  }
+
+  async submitReport(request: SubmitReportRequest): Promise<IncidentReport> {
+    const response = await fetch(`${this.baseUrl}/reports/submit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Submit report error: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  async getReport(reportId: string): Promise<IncidentReport> {
+    const response = await fetch(`${this.baseUrl}/reports/${reportId}`);
+
+    if (!response.ok) {
+      throw new Error(`Get report error: ${response.statusText}`);
+    }
+
+    return response.json();
   }
 
   async checkHealth(): Promise<string> {
