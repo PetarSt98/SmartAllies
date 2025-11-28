@@ -253,8 +253,8 @@ export function ChatInterface() {
         <div className="absolute inset-x-0 top-1/3 mx-auto h-[520px] max-w-4xl bg-gradient-to-br from-orange-200/30 via-white/40 to-orange-100/30 blur-3xl rounded-full" />
       </div>
 
-      <div className="relative z-10 flex flex-col min-h-screen max-w-6xl mx-auto w-full px-4 sm:px-6 pt-4 pb-32">
-        <header className="sticky top-3 sm:top-5 z-30 flex items-center justify-between border border-white/70 bg-white/90 px-4 sm:px-6 py-3 sm:py-4 shadow-xl backdrop-blur-2xl rounded-2xl">
+      <div className="relative z-10 flex flex-col min-h-screen max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6 pb-32 space-y-6 sm:space-y-8">
+        <header className="sticky top-0 sm:top-3 z-40 flex items-center justify-between border border-orange-100/80 bg-gradient-to-b from-white/95 via-white/90 to-white/75 px-4 sm:px-6 py-3 sm:py-4 shadow-2xl backdrop-blur-2xl rounded-2xl">
           <button
             onClick={() => window.location.href = '/'}
             className="flex items-center gap-3 hover:opacity-90 transition-opacity"
@@ -274,7 +274,7 @@ export function ChatInterface() {
           </div>
         </header>
 
-        <div className="mt-6 sm:mt-8 grid gap-4 sm:gap-6">
+        <div className="grid gap-4 sm:gap-6">
           <div className="grid sm:grid-cols-3 gap-3">
             <div className="col-span-2 bg-white/80 backdrop-blur-xl border border-orange-100 rounded-3xl shadow-[0_25px_80px_-45px_rgba(249,115,22,0.65)] px-4 sm:px-6 py-4 sm:py-6">
               <div className="flex flex-wrap gap-3 items-center justify-between">
