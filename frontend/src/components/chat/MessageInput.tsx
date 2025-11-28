@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { apiService } from '@/services/api.service';
 
 interface MessageInputProps {
-  onSendMessage: (message: string, options?: { imageUrl?: string }) => void;
+  onSendMessage: (message: string, options?: { imageUrl?: string; imagePreview?: string }) => void;
   isLoading: boolean;
 }
 
@@ -20,22 +20,12 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
     e.preventDefault();
     if (!message.trim() && !selectedImage) return;
 
-    let imageUrl: string | undefined;
-    let content = message.trim();
+    const content = message.trim() || 'Image attached.';
 
-    if (!content && selectedImage) {
-      content = 'Image attached.';
-    }
-
-    if (selectedImage) {
-      try {
-        imageUrl = await apiService.uploadImage(selectedImage);
-      } catch (error) {
-        console.error('Image upload failed:', error);
-      }
-    }
-
-    onSendMessage(content, { imageUrl });
+    onSendMessage(content, { 
+      imagePreview: imagePreview || undefined 
+    });
+    
     setMessage('');
     setSelectedImage(null);
     setImagePreview(null);
@@ -61,24 +51,24 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-t border-orange-100/70 p-5 bg-white/80 backdrop-blur">
+    <form onSubmit={handleSubmit} className="border-t border-orange-100/70 p-3 sm:p-5 bg-white/80 backdrop-blur">
       {imagePreview && (
-        <div className="mb-3 relative inline-block">
+        <div className="mb-2 sm:mb-3 relative inline-block">
           <img
             src={imagePreview}
             alt="Preview"
-            className="h-20 w-20 object-cover rounded-xl shadow-md border border-white/80"
+            className="h-16 w-16 sm:h-20 sm:w-20 object-cover rounded-xl shadow-md border border-white/80"
           />
           <button
             type="button"
             onClick={removeImage}
-            className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-7 h-7 flex items-center justify-center text-xs shadow-lg"
+            className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center text-xs shadow-lg"
           >
             ×
           </button>
         </div>
       )}
-      <div className="flex gap-3">
+      <div className="flex gap-2 sm:gap-3">
         <input
           ref={fileInputRef}
           type="file"
@@ -100,7 +90,7 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           size="icon"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
-          className="shadow-sm"
+          className="shadow-sm flex-shrink-0"
         >
           <Paperclip className="h-4 w-4" />
         </Button>
@@ -110,7 +100,7 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           size="icon"
           onClick={() => cameraInputRef.current?.click()}
           disabled={isLoading}
-          className="shadow-sm"
+          className="shadow-sm flex-shrink-0"
         >
           <Camera className="h-4 w-4" />
         </Button>
@@ -119,9 +109,9 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type your message..."
           disabled={isLoading}
-          className="flex-1 shadow-sm"
+          className="flex-1 shadow-sm min-w-0"
         />
-        <Button type="submit" disabled={isLoading || (!message.trim() && !selectedImage)} className="shadow-lg">
+        <Button type="submit" disabled={isLoading || (!message.trim() && !selectedImage)} className="shadow-lg flex-shrink-0">
           <Send className="h-4 w-4" />
         </Button>
       </div>

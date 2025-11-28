@@ -5,6 +5,12 @@
 @layer base {
   * {
     border-color: rgb(229, 231, 235);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    height: 100%;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -15,5 +21,19 @@
       radial-gradient(circle at 50% 80%, rgba(250, 91, 53, 0.08), transparent 30%),
       linear-gradient(135deg, #fff7f3 0%, #ffffff 55%, #fff0e7 100%);
     min-height: 100vh;
+    min-height: -webkit-fill-available;
+    /* iOS safe area support */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* Prevent font size adjustment on iOS */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+
+  #root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 }

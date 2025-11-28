@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusTimeline } from './StatusTimeline';
 import { apiService } from '@/services/api.service';
 import type { IncidentReport } from '@/types/report.types';
-import { MapPin, Calendar, User, FileText } from 'lucide-react';
+import { MapPin, Calendar, User, FileText, Home } from 'lucide-react';
 
 export function ReportPage() {
   const { reportId } = useParams<{ reportId: string }>();
+  const navigate = useNavigate();
   const [report, setReport] = useState<IncidentReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +58,20 @@ export function ReportPage() {
         <div className="absolute -left-10 -top-16 h-64 w-64 rounded-full bg-orange-200 blur-3xl" />
         <div className="absolute right-0 top-1/3 h-72 w-72 rounded-full bg-orange-100 blur-3xl" />
         <div className="absolute bottom-0 left-1/4 h-80 w-80 rounded-full bg-orange-50 blur-3xl" />
+      </div>
+
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50 bg-white/85 backdrop-blur-md border-b border-orange-100/60 shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+          >
+            <Home className="h-5 w-5 sm:h-6 sm:w-6" />
+            <span className="text-sm sm:text-base font-medium">Home</span>
+          </button>
+          <img src="/images/logo/SQ.svg" alt="SmartAllies logo" className="h-8 w-8 sm:h-10 sm:w-10" />
+        </div>
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-10 space-y-6">

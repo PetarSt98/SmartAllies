@@ -6,6 +6,7 @@ import type { FloorPlanSelection } from '@/types/floor-plan.types';
 
 interface SendMessageOptions {
   imageUrl?: string;
+  imagePreview?: string;
   floorPlanSelection?: FloorPlanSelection;
 }
 
@@ -29,17 +30,18 @@ export function useChatWorkflow() {
 
   const sendMessage = useCallback(
     async (content: string, options?: SendMessageOptions) => {
+      setIsLoading(true);
+
       const userMessage: ChatMessage = {
         id: Date.now().toString(),
         role: 'user',
         content,
         timestamp: new Date(),
-        imageUrl: options?.imageUrl,
+        imageUrl: options?.imageUrl || options?.imagePreview,
         floorPlanSelection: options?.floorPlanSelection,
       };
 
       setMessages((prev) => [...prev, userMessage]);
-      setIsLoading(true);
 
       try {
         const response = await apiService.sendMessage({
@@ -66,7 +68,7 @@ export function useChatWorkflow() {
           content: 'I apologize, but I encountered an error. Please try again.',
           timestamp: new Date(),
         };
-        setMessages((prev) => [...prev, errorMessage]);
+        setMessages((prev) => [...prev, assistantMessage]);
       } finally {
         setIsLoading(false);
       }

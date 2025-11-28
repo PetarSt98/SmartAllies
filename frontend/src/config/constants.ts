@@ -1,7 +1,7 @@
 export const APP_CONFIG = {
   API_BASE_URL: '/api',
   PRIMARY_COLOR: '#fa5b35',
-  APP_NAME: 'SmartAllies',
+  APP_NAME: 'SmartAlly',
   APP_DESCRIPTION: 'Incident Reporting System',
 } as const;
 

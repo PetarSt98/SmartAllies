@@ -195,96 +195,34 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative h-full flex flex-col overflow-hidden">
       <div className="pointer-events-none absolute inset-0 opacity-80">
         <div className="absolute -left-16 -top-16 h-64 w-64 rounded-full bg-orange-200 blur-3xl" />
         <div className="absolute right-0 top-1/4 h-72 w-72 rounded-full bg-orange-100 blur-3xl" />
         <div className="absolute -bottom-24 left-1/3 h-80 w-80 rounded-full bg-orange-50 blur-3xl" />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-6 flex flex-col gap-6">
-        <header className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/80 px-5 py-4 shadow-xl backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <img src="/images/logo/SQ.svg" alt="SmartAllies logo" className="h-10 w-10" />
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900">SmartAllies Incident Reporting</h1>
-              <p className="text-sm text-gray-600">Secure, supportive, and always ready to help</p>
-            </div>
-          </div>
-          <div className="hidden sm:flex items-center gap-2 rounded-full bg-orange-50 px-4 py-2 text-sm font-medium text-primary shadow-inner">
-            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Live assistance
-          </div>
+      <div className="relative z-10 flex flex-col h-screen max-w-6xl mx-auto w-full">
+        <header className="sticky top-0 z-20 flex items-center border-b border-white/60 bg-white/80 px-4 sm:px-5 py-3 sm:py-4 shadow-lg backdrop-blur-md sm:mx-4 sm:mt-4 sm:rounded-2xl sm:border flex-shrink-0">
+          <button 
+            onClick={() => window.location.href = '/'}
+            className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity"
+          >
+            <img src="/images/logo/SQ.svg" alt="SmartAllies logo" className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0" />
+            <h1 className="text-base sm:text-xl font-semibold text-gray-900 whitespace-nowrap">SmartAlly</h1>
+          </button>
         </header>
 
-        <div className="flex-1 flex flex-col">
-          <Card className="flex-1 flex flex-col overflow-hidden border-orange-100/70 shadow-2xl">
+        <div className="flex-1 flex flex-col min-h-0 sm:px-4 overflow-y-auto pb-2 pt-20 sm:pt-0">
+          <Card className="flex-1 flex flex-col overflow-hidden border-0 sm:border sm:border-orange-100/70 shadow-none sm:shadow-2xl rounded-none sm:rounded-2xl mt-2 sm:mt-4">
             <div className="h-1 w-full bg-gradient-to-r from-primary via-orange-400 to-orange-300" />
             <MessageList messages={messages} />
 
             {showFloorPlan ? (
-              <div className="p-6 border-t border-orange-100/70 bg-white/60 backdrop-blur">
+              <div className="p-3 sm:p-6 border-t border-orange-100/70 bg-white/60 backdrop-blur">
                 <FloorPlanSelector onLocationSelect={handleLocationSelect} />
               </div>
             ) : null}
-
-            {shouldShowFacilityDetails && (
-              <div className="p-6 border-t border-orange-100/70 bg-gradient-to-r from-orange-50 to-white space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">Add more details for the facilities team</p>
-                    <p className="text-sm text-gray-600">
-                      Share extra context or a photo. This will be saved to the report without going through the assistant.
-                    </p>
-                  </div>
-                  {facilityDetailsSaved && (
-                    <span className="text-sm font-semibold text-green-700">Saved</span>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  <textarea
-                    className="w-full rounded-xl border border-orange-100 bg-white/90 p-3 text-sm shadow-inner focus:border-primary focus:outline-none"
-                    rows={3}
-                    placeholder="Add any extra details about this facility issue..."
-                    value={facilityDetails}
-                    onChange={(e) => {
-                      setFacilityDetails(e.target.value);
-                      setFacilityDetailsSaved(false);
-                    }}
-                  />
-
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3">
-                      <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-primary">
-                        <input type="file" accept="image/*" className="hidden" onChange={handleFacilityImageSelect} />
-                        <span className="inline-flex items-center justify-center rounded-full bg-white px-3 py-1 shadow-sm border border-orange-100">
-                          Upload photo
-                        </span>
-                      </label>
-                      {facilityImagePreview && (
-                        <div className="relative h-16 w-16 overflow-hidden rounded-lg border border-orange-100 shadow-sm">
-                          <img src={facilityImagePreview} alt="Preview" className="h-full w-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={removeFacilityImage}
-                            className="absolute -right-2 -top-2 rounded-full bg-primary px-2 py-1 text-xs font-bold text-white shadow-lg"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <Button onClick={handleSaveFacilityDetails} disabled={isSavingFacilityDetails}>
-                      {isSavingFacilityDetails ? 'Saving...' : 'Save for report'}
-                    </Button>
-                  </div>
-
-                  {facilityDetailsError && <p className="text-sm text-red-600">{facilityDetailsError}</p>}
-                </div>
-              </div>
-            )}
 
             {shouldShowActions && (
               <ActionButtons
@@ -295,21 +233,23 @@ export function ChatInterface() {
             )}
 
             {showHROptions ? (
-              <div className="border-t border-orange-100/70 p-6 bg-gradient-to-r from-orange-50 to-white">
+              <div className="border-t border-orange-100/70 p-3 sm:p-6 bg-gradient-to-r from-orange-50 to-white">
                 <p className="text-sm text-gray-700 mb-3 text-center font-medium">
                   Would you like to share more details or connect with an HR partner?
                 </p>
-                <div className="flex gap-3 flex-wrap justify-center">
+                <div className="flex gap-2 sm:gap-3 flex-col sm:flex-row justify-center">
                   <Button
                     variant="outline"
                     onClick={() => sendMessage('Share more details')}
                     disabled={isLoading || isConnectingHR}
+                    className="w-full sm:w-auto"
                   >
                     Share More Details
                   </Button>
                   <Button
                     onClick={() => handleActionClick('Connect to HR')}
                     disabled={isLoading || isConnectingHR}
+                    className="w-full sm:w-auto"
                   >
                     Connect to HR Partner
                   </Button>
@@ -318,40 +258,43 @@ export function ChatInterface() {
             ) : null}
 
             {canSubmit && !submissionComplete && (
-              <div className="border-t border-orange-100/70 p-6 bg-white/70 backdrop-blur space-y-4">
-                <div className="flex gap-3 flex-wrap justify-center">
-                  <Button variant="outline" onClick={handleCancel}>
+              <div className="border-t border-orange-100/70 p-3 sm:p-6 bg-white/70 backdrop-blur space-y-3 sm:space-y-4">
+                <div className="flex gap-2 sm:gap-3 flex-col sm:flex-row justify-center">
+                  <Button variant="outline" onClick={handleCancel} className="w-full sm:w-auto">
                     Cancel
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => setSubmissionMode('anonymous')}
                     disabled={isSubmitting}
+                    className="w-full sm:w-auto"
                   >
                     Submit Anonymously
                   </Button>
                   <Button
                     onClick={() => setSubmissionMode('identified')}
                     disabled={isSubmitting}
+                    className="w-full sm:w-auto"
                   >
                     Submit Report
                   </Button>
                 </div>
 
                 {submissionMode === 'anonymous' && (
-                  <div className="bg-white/80 border border-orange-100 rounded-2xl p-4 space-y-3 shadow-inner">
+                  <div className="bg-white/80 border border-orange-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-3 shadow-inner">
                     <p className="text-sm text-gray-700">
                       Submit anonymously? Your name and phone number will not be shared.
                     </p>
-                    <div className="flex gap-3 justify-end">
+                    <div className="flex gap-2 sm:gap-3 flex-col-reverse sm:flex-row sm:justify-end">
                       <Button
                         variant="outline"
                         onClick={() => setSubmissionMode(null)}
                         disabled={isSubmitting}
+                        className="w-full sm:w-auto"
                       >
                         Back
                       </Button>
-                      <Button onClick={() => handleSubmitReport(true)} disabled={isSubmitting}>
+                      <Button onClick={() => handleSubmitReport(true)} disabled={isSubmitting} className="w-full sm:w-auto">
                         Confirm Anonymous Submission
                       </Button>
                     </div>
@@ -359,7 +302,7 @@ export function ChatInterface() {
                 )}
 
                 {submissionMode === 'identified' && (
-                  <div className="bg-white/80 border border-orange-100 rounded-2xl p-4 space-y-3 shadow-inner">
+                  <div className="bg-white/80 border border-orange-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-3 shadow-inner">
                     <p className="text-sm text-gray-700">
                       Please share your name and an optional phone number so we can follow up.
                     </p>
@@ -384,17 +327,19 @@ export function ChatInterface() {
                         />
                       </div>
                     </div>
-                    <div className="flex gap-3 justify-end">
+                    <div className="flex gap-2 sm:gap-3 flex-col-reverse sm:flex-row sm:justify-end">
                       <Button
                         variant="outline"
                         onClick={() => setSubmissionMode(null)}
                         disabled={isSubmitting}
+                        className="w-full sm:w-auto"
                       >
                         Back
                       </Button>
                       <Button
                         onClick={() => handleSubmitReport(false)}
                         disabled={isSubmitting || !submittedBy.trim()}
+                        className="w-full sm:w-auto"
                       >
                         Submit with Details
                       </Button>
@@ -407,11 +352,11 @@ export function ChatInterface() {
             )}
 
             {submissionComplete && submittedReportId && (
-              <div className="border-t border-orange-100/70 p-6 bg-green-50/80 backdrop-blur space-y-3">
-                <p className="text-sm text-green-800 font-medium">
+              <div className="border-t border-orange-100/70 p-3 sm:p-6 bg-green-50/80 backdrop-blur space-y-3">
+                <p className="text-sm text-green-800 font-medium text-center">
                   Your report has been submitted. You can view it now or start a new conversation.
                 </p>
-                <div className="flex gap-3 flex-wrap justify-center">
+                <div className="flex gap-2 sm:gap-3 flex-col sm:flex-row justify-center">
                   <Button
                     variant="outline"
                     onClick={() => navigate(`/report/${submittedReportId}`)}
@@ -425,8 +370,13 @@ export function ChatInterface() {
               </div>
             )}
 
-            <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
           </Card>
+        </div>
+        
+        <div className="fixed bottom-0 left-0 right-0 z-20 sm:px-4 pb-safe flex-shrink-0">
+          <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md border-t border-white/60 sm:border sm:rounded-2xl shadow-lg pb-4 sm:pb-6">
+            <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
+          </div>
         </div>
       </div>
     </div>
