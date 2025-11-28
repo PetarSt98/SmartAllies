@@ -17,14 +17,15 @@ export function ActionButtons({
   }
 
   return (
-    <div className="border-t p-4 bg-gray-50">
-      <div className="flex flex-wrap gap-2 justify-center">
+    <div className="border-t border-orange-100/70 p-5 bg-white/60 backdrop-blur">
+      <div className="flex flex-wrap gap-3 justify-center">
         {response.suggestedActions.map((action) => (
           <Button
             key={action}
             onClick={() => onActionClick(action)}
             disabled={isLoading}
             variant="outline"
+            className="rounded-full px-4 py-2 shadow-sm"
           >
             {action}
           </Button>

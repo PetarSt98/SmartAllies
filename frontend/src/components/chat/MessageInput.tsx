@@ -61,24 +61,24 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-t p-4 bg-white">
+    <form onSubmit={handleSubmit} className="border-t border-orange-100/70 p-5 bg-white/80 backdrop-blur">
       {imagePreview && (
-        <div className="mb-2 relative inline-block">
+        <div className="mb-3 relative inline-block">
           <img
             src={imagePreview}
             alt="Preview"
-            className="h-20 w-20 object-cover rounded-md"
+            className="h-20 w-20 object-cover rounded-xl shadow-md border border-white/80"
           />
           <button
             type="button"
             onClick={removeImage}
-            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+            className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-7 h-7 flex items-center justify-center text-xs shadow-lg"
           >
             ×
           </button>
         </div>
       )}
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <input
           ref={fileInputRef}
           type="file"
@@ -100,6 +100,7 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           size="icon"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
+          className="shadow-sm"
         >
           <Paperclip className="h-4 w-4" />
         </Button>
@@ -109,6 +110,7 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           size="icon"
           onClick={() => cameraInputRef.current?.click()}
           disabled={isLoading}
+          className="shadow-sm"
         >
           <Camera className="h-4 w-4" />
         </Button>
@@ -117,9 +119,9 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type your message..."
           disabled={isLoading}
-          className="flex-1"
+          className="flex-1 shadow-sm"
         />
-        <Button type="submit" disabled={isLoading || (!message.trim() && !selectedImage)}>
+        <Button type="submit" disabled={isLoading || (!message.trim() && !selectedImage)} className="shadow-lg">
           <Send className="h-4 w-4" />
         </Button>
       </div>

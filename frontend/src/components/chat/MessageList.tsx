@@ -7,7 +7,7 @@ interface MessageListProps {
 
 export function MessageList({ messages }: MessageListProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 bg-gradient-to-b from-white/80 via-white/70 to-transparent">
       {messages.map((message) => (
         <div
           key={message.id}
@@ -18,10 +18,10 @@ export function MessageList({ messages }: MessageListProps) {
         >
           <div
             className={cn(
-              'max-w-[80%] rounded-lg px-4 py-2',
+              'max-w-[80%] rounded-2xl px-5 py-3 shadow-md border border-white/50 backdrop-blur-sm',
               message.role === 'user'
-                ? 'bg-primary text-white'
-                : 'bg-gray-100 text-gray-900'
+                ? 'bg-gradient-to-br from-primary to-orange-500 text-white shadow-lg'
+                : 'bg-white/90 text-gray-900'
             )}
           >
             {message.imageUrl && (
@@ -32,7 +32,10 @@ export function MessageList({ messages }: MessageListProps) {
               />
             )}
             <p className="whitespace-pre-wrap">{message.content}</p>
-            <span className="text-xs opacity-70 mt-1 block">
+            <span className={cn(
+              'text-[11px] mt-2 block',
+              message.role === 'user' ? 'text-white/80' : 'text-gray-500'
+            )}>
               {message.timestamp.toLocaleTimeString()}
             </span>
           </div>

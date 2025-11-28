@@ -122,163 +122,181 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <header className="bg-primary text-white p-4 shadow-md flex items-center gap-3">
-        <img src="/images/logo/SQ.svg" alt="SmartAllies logo" className="h-8 w-8" />
-        <h1 className="text-xl font-semibold">SmartAllies Incident Reporting</h1>
-      </header>
+    <div className="relative min-h-screen overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 opacity-80">
+        <div className="absolute -left-16 -top-16 h-64 w-64 rounded-full bg-orange-200 blur-3xl" />
+        <div className="absolute right-0 top-1/4 h-72 w-72 rounded-full bg-orange-100 blur-3xl" />
+        <div className="absolute -bottom-24 left-1/3 h-80 w-80 rounded-full bg-orange-50 blur-3xl" />
+      </div>
 
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
-        <Card className="flex-1 flex flex-col m-4 overflow-hidden">
-          <MessageList messages={messages} />
-
-          {showFloorPlan ? (
-            <div className="p-4 border-t">
-              <FloorPlanSelector onLocationSelect={handleLocationSelect} />
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-6 flex flex-col gap-6">
+        <header className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/80 px-5 py-4 shadow-xl backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <img src="/images/logo/SQ.svg" alt="SmartAllies logo" className="h-10 w-10" />
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">SmartAllies Incident Reporting</h1>
+              <p className="text-sm text-gray-600">Secure, supportive, and always ready to help</p>
             </div>
-          ) : null}
+          </div>
+          <div className="hidden sm:flex items-center gap-2 rounded-full bg-orange-50 px-4 py-2 text-sm font-medium text-primary shadow-inner">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+            Live assistance
+          </div>
+        </header>
 
-          {shouldShowActions && (
-            <ActionButtons
-              response={currentResponse}
-              onActionClick={handleActionClick}
-              isLoading={isLoading || isConnectingHR}
-            />
-          )}
+        <div className="flex-1 flex flex-col">
+          <Card className="flex-1 flex flex-col overflow-hidden border-orange-100/70 shadow-2xl">
+            <div className="h-1 w-full bg-gradient-to-r from-primary via-orange-400 to-orange-300" />
+            <MessageList messages={messages} />
 
-          {showHROptions ? (
-            <div className="border-t p-4 bg-blue-50">
-              <p className="text-sm text-gray-700 mb-3 text-center">
-                Would you like to share more details or connect with an HR partner?
-              </p>
-              <div className="flex gap-3 justify-center">
-                <Button
-                  variant="outline"
-                  onClick={() => sendMessage('Share more details')}
-                  disabled={isLoading || isConnectingHR}
-                >
-                  Share More Details
-                </Button>
-                <Button
-                  onClick={() => handleActionClick('Connect to HR')}
-                  disabled={isLoading || isConnectingHR}
-                >
-                  Connect to HR Partner
-                </Button>
+            {showFloorPlan ? (
+              <div className="p-6 border-t border-orange-100/70 bg-white/60 backdrop-blur">
+                <FloorPlanSelector onLocationSelect={handleLocationSelect} />
               </div>
-            </div>
-          ) : null}
+            ) : null}
 
-          {canSubmit && !submissionComplete && (
-            <div className="border-t p-4 bg-gray-50 space-y-4">
-              <div className="flex gap-3 justify-center">
-                <Button variant="outline" onClick={handleCancel}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setSubmissionMode('anonymous')}
-                  disabled={isSubmitting}
-                >
-                  Submit Anonymously
-                </Button>
-                <Button
-                  onClick={() => setSubmissionMode('identified')}
-                  disabled={isSubmitting}
-                >
-                  Submit Report
-                </Button>
-              </div>
+            {shouldShowActions && (
+              <ActionButtons
+                response={currentResponse}
+                onActionClick={handleActionClick}
+                isLoading={isLoading || isConnectingHR}
+              />
+            )}
 
-              {submissionMode === 'anonymous' && (
-                <div className="bg-white border rounded-lg p-4 space-y-3">
-                  <p className="text-sm text-gray-700">
-                    Submit anonymously? Your name and phone number will not be shared.
-                  </p>
-                  <div className="flex gap-3 justify-end">
-                    <Button
-                      variant="outline"
-                      onClick={() => setSubmissionMode(null)}
-                      disabled={isSubmitting}
-                    >
-                      Back
-                    </Button>
-                    <Button onClick={() => handleSubmitReport(true)} disabled={isSubmitting}>
-                      Confirm Anonymous Submission
-                    </Button>
-                  </div>
+            {showHROptions ? (
+              <div className="border-t border-orange-100/70 p-6 bg-gradient-to-r from-orange-50 to-white">
+                <p className="text-sm text-gray-700 mb-3 text-center font-medium">
+                  Would you like to share more details or connect with an HR partner?
+                </p>
+                <div className="flex gap-3 flex-wrap justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => sendMessage('Share more details')}
+                    disabled={isLoading || isConnectingHR}
+                  >
+                    Share More Details
+                  </Button>
+                  <Button
+                    onClick={() => handleActionClick('Connect to HR')}
+                    disabled={isLoading || isConnectingHR}
+                  >
+                    Connect to HR Partner
+                  </Button>
                 </div>
-              )}
+              </div>
+            ) : null}
 
-              {submissionMode === 'identified' && (
-                <div className="bg-white border rounded-lg p-4 space-y-3">
-                  <p className="text-sm text-gray-700">
-                    Please share your name and an optional phone number so we can follow up.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700">Name</label>
-                      <Input
-                        value={submittedBy}
-                        onChange={(e) => setSubmittedBy(e.target.value)}
-                        placeholder="Enter your name"
+            {canSubmit && !submissionComplete && (
+              <div className="border-t border-orange-100/70 p-6 bg-white/70 backdrop-blur space-y-4">
+                <div className="flex gap-3 flex-wrap justify-center">
+                  <Button variant="outline" onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setSubmissionMode('anonymous')}
+                    disabled={isSubmitting}
+                  >
+                    Submit Anonymously
+                  </Button>
+                  <Button
+                    onClick={() => setSubmissionMode('identified')}
+                    disabled={isSubmitting}
+                  >
+                    Submit Report
+                  </Button>
+                </div>
+
+                {submissionMode === 'anonymous' && (
+                  <div className="bg-white/80 border border-orange-100 rounded-2xl p-4 space-y-3 shadow-inner">
+                    <p className="text-sm text-gray-700">
+                      Submit anonymously? Your name and phone number will not be shared.
+                    </p>
+                    <div className="flex gap-3 justify-end">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSubmissionMode(null)}
                         disabled={isSubmitting}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700">Phone Number (optional)</label>
-                      <Input
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        placeholder="Enter your phone number"
-                        type="tel"
-                        disabled={isSubmitting}
-                      />
+                      >
+                        Back
+                      </Button>
+                      <Button onClick={() => handleSubmitReport(true)} disabled={isSubmitting}>
+                        Confirm Anonymous Submission
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex gap-3 justify-end">
-                    <Button
-                      variant="outline"
-                      onClick={() => setSubmissionMode(null)}
-                      disabled={isSubmitting}
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      onClick={() => handleSubmitReport(false)}
-                      disabled={isSubmitting || !submittedBy.trim()}
-                    >
-                      Submit with Details
-                    </Button>
+                )}
+
+                {submissionMode === 'identified' && (
+                  <div className="bg-white/80 border border-orange-100 rounded-2xl p-4 space-y-3 shadow-inner">
+                    <p className="text-sm text-gray-700">
+                      Please share your name and an optional phone number so we can follow up.
+                    </p>
+                    <div className="space-y-2">
+                      <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Name</label>
+                        <Input
+                          value={submittedBy}
+                          onChange={(e) => setSubmittedBy(e.target.value)}
+                          placeholder="Enter your name"
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Phone Number (optional)</label>
+                        <Input
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          placeholder="Enter your phone number"
+                          type="tel"
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-3 justify-end">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSubmissionMode(null)}
+                        disabled={isSubmitting}
+                      >
+                        Back
+                      </Button>
+                      <Button
+                        onClick={() => handleSubmitReport(false)}
+                        disabled={isSubmitting || !submittedBy.trim()}
+                      >
+                        Submit with Details
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {submissionError && <p className="text-sm text-red-600 text-center">{submissionError}</p>}
-            </div>
-          )}
-
-          {submissionComplete && submittedReportId && (
-            <div className="border-t p-4 bg-green-50 space-y-3">
-              <p className="text-sm text-green-800">
-                Your report has been submitted. You can view it now or start a new conversation.
-              </p>
-              <div className="flex gap-3 justify-center">
-                <Button
-                  variant="outline"
-                  onClick={() => navigate(`/report/${submittedReportId}`)}
-                >
-                  View submitted report
-                </Button>
-                <Button onClick={handleCancel} variant="ghost">
-                  Start new chat
-                </Button>
+                {submissionError && <p className="text-sm text-red-600 text-center">{submissionError}</p>}
               </div>
-            </div>
-          )}
+            )}
 
-          <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
-        </Card>
+            {submissionComplete && submittedReportId && (
+              <div className="border-t border-orange-100/70 p-6 bg-green-50/80 backdrop-blur space-y-3">
+                <p className="text-sm text-green-800 font-medium">
+                  Your report has been submitted. You can view it now or start a new conversation.
+                </p>
+                <div className="flex gap-3 flex-wrap justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate(`/report/${submittedReportId}`)}
+                  >
+                    View submitted report
+                  </Button>
+                  <Button onClick={handleCancel} variant="ghost">
+                    Start new chat
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
+          </Card>
+        </div>
       </div>
     </div>
   );
