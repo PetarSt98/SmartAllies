@@ -39,6 +39,9 @@ public class ChatOrchestrationService {
             case AWAITING_REPORT_CONFIRMATION -> handleReportConfirmation(context, request);
             case AWAITING_HR_DECISION -> handleHRDecision(context, request);
             case EMERGENCY_ACTIVE -> handleEmergencyFlow(context, request);
+            case REPORT_READY -> handleReportReady(context);
+            case ALERT_SENT -> handleAlertSent(context);
+            case COMPLETED -> handleCompleted(context);
             default -> buildErrorResponse("Invalid workflow state");
         };
     }
@@ -391,6 +394,33 @@ public class ChatOrchestrationService {
         return ChatResponse.builder()
                 .message(jsonResponse.get("message").asText())
                 .incidentType(IncidentType.EMERGENCY)
+                .workflowState(context.getWorkflowState())
+                .metadata(Map.of("collectedFields", context.getCollectedFields()))
+                .build();
+    }
+
+    private ChatResponse handleReportReady(ConversationContext context) {
+        return ChatResponse.builder()
+                .message("Your report is ready to submit. Please choose whether to submit with your details, anonymously, or cancel to start over.")
+                .incidentType(context.getIncidentType())
+                .workflowState(context.getWorkflowState())
+                .metadata(Map.of("collectedFields", context.getCollectedFields()))
+                .build();
+    }
+
+    private ChatResponse handleAlertSent(ConversationContext context) {
+        return ChatResponse.builder()
+                .message("An emergency alert has already been sent. If you need to start a new report, please begin a new conversation.")
+                .incidentType(context.getIncidentType())
+                .workflowState(context.getWorkflowState())
+                .metadata(Map.of("collectedFields", context.getCollectedFields()))
+                .build();
+    }
+
+    private ChatResponse handleCompleted(ConversationContext context) {
+        return ChatResponse.builder()
+                .message("This conversation has been completed. If you need further assistance, please start a new report.")
+                .incidentType(context.getIncidentType())
                 .workflowState(context.getWorkflowState())
                 .metadata(Map.of("collectedFields", context.getCollectedFields()))
                 .build();

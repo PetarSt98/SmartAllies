@@ -1,3 +1,4 @@
+import type React from 'react';
 import { useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -85,7 +86,7 @@ export function FloorPlanSelector({ onLocationSelect }: FloorPlanSelectorProps) 
 
         <div
           onClick={handleClick}
-          className="relative w-full bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg cursor-crosshair hover:bg-gray-50 transition-colors overflow-hidden aspect-square"
+          className="relative w-full max-h-[500px] bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg cursor-crosshair hover:bg-gray-50 transition-colors overflow-hidden aspect-[4/3]"
           style={{
             backgroundImage: `url('${FLOOR_IMAGES[selectedFloor]}')`,
             backgroundSize: 'contain',
