@@ -4,15 +4,20 @@ import { generateSessionId } from '@/utils/helpers';
 import type { ChatMessage, ChatResponse } from '@/types/incident.types';
 
 export function useChatWorkflow() {
-  const [sessionId] = useState(() => generateSessionId());
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: 'Hello! I\'m here to help you report an incident. How can I assist you today?',
-      timestamp: new Date(),
-    },
-  ]);
+  const createInitialMessages = useCallback(
+    () => [
+      {
+        id: '1',
+        role: 'assistant',
+        content: "Hello! I'm here to help you report an incident. How can I assist you today?",
+        timestamp: new Date(),
+      } as ChatMessage,
+    ],
+    []
+  );
+
+  const [sessionId, setSessionId] = useState(() => generateSessionId());
+  const [messages, setMessages] = useState<ChatMessage[]>(createInitialMessages);
   const [isLoading, setIsLoading] = useState(false);
   const [currentResponse, setCurrentResponse] = useState<ChatResponse | null>(null);
 
@@ -62,11 +67,19 @@ export function useChatWorkflow() {
     [sessionId]
   );
 
+  const resetChat = useCallback(() => {
+    setSessionId(generateSessionId());
+    setMessages(createInitialMessages());
+    setCurrentResponse(null);
+    setIsLoading(false);
+  }, [createInitialMessages]);
+
   return {
     messages,
     isLoading,
     currentResponse,
     sendMessage,
     sessionId,
+    resetChat,
   };
 }
