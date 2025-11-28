@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Send, Paperclip, Camera } from 'lucide-react';
+import { Send, Paperclip, Camera, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiService } from '@/services/api.service';
@@ -56,24 +56,33 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-t p-4 bg-white">
+    <form
+      onSubmit={handleSubmit}
+      className="border-t border-orange-100/80 bg-white/80 px-6 py-4 backdrop-blur"
+    >
       {imagePreview && (
-        <div className="mb-2 relative inline-block">
+        <div className="mb-3 flex items-center gap-3 rounded-xl border border-orange-100/80 bg-orange-50/70 p-3 shadow-inner">
           <img
             src={imagePreview}
             alt="Preview"
-            className="h-20 w-20 object-cover rounded-md"
+            className="h-16 w-16 object-cover rounded-lg border border-white shadow"
           />
-          <button
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-slate-800">Attached image</p>
+            <p className="text-xs text-slate-500">We will send this with your next message.</p>
+          </div>
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={removeImage}
-            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+            className="rounded-full"
           >
-            ×
-          </button>
+            <X className="h-4 w-4" />
+          </Button>
         </div>
       )}
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2 rounded-2xl border border-orange-100/80 bg-white/90 px-3 py-2 shadow-lg">
         <input
           ref={fileInputRef}
           type="file"
@@ -95,6 +104,7 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           size="icon"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
+          className="shrink-0"
         >
           <Paperclip className="h-4 w-4" />
         </Button>
@@ -104,17 +114,22 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           size="icon"
           onClick={() => cameraInputRef.current?.click()}
           disabled={isLoading}
+          className="shrink-0"
         >
           <Camera className="h-4 w-4" />
         </Button>
         <Input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message..."
+          placeholder="Describe the incident, add context, or ask for help..."
           disabled={isLoading}
-          className="flex-1"
+          className="flex-1 border-none bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
         />
-        <Button type="submit" disabled={isLoading || (!message.trim() && !selectedImage)}>
+        <Button
+          type="submit"
+          disabled={isLoading || (!message.trim() && !selectedImage)}
+          className="shrink-0"
+        >
           <Send className="h-4 w-4" />
         </Button>
       </div>

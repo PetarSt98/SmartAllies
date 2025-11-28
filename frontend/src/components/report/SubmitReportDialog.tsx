@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { apiService } from '@/services/api.service';
+import { ShieldCheck, User, Phone } from 'lucide-react';
 
 interface SubmitReportDialogProps {
   sessionId: string;
@@ -25,7 +26,7 @@ export function SubmitReportDialog({ sessionId, onCancel }: SubmitReportDialogPr
         anonymous,
         phoneNumber: phoneNumber || undefined,
       });
-      
+
       navigate(`/report/${report.reportId}`);
     } catch (error) {
       console.error('Failed to submit report:', error);
@@ -36,15 +37,21 @@ export function SubmitReportDialog({ sessionId, onCancel }: SubmitReportDialogPr
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Submit Incident Report</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <Card className="w-full max-w-md border-orange-100 shadow-2xl">
+        <CardHeader className="flex-row items-center gap-3 border-b border-orange-100/70 bg-gradient-to-r from-orange-50/80 to-white rounded-t-2xl">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-orange-500 text-white flex items-center justify-center shadow-md">
+            <ShieldCheck className="h-6 w-6" />
+          </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Your Name (optional)
+            <p className="text-sm text-slate-600">Finalize your report</p>
+            <CardTitle className="text-xl">Submit Incident Report</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4 pt-5">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-2">
+              <User className="h-4 w-4 text-primary" /> Your Name (optional)
             </label>
             <Input
               value={submittedBy}
@@ -55,8 +62,8 @@ export function SubmitReportDialog({ sessionId, onCancel }: SubmitReportDialogPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number (optional)
+            <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-2">
+              <Phone className="h-4 w-4 text-primary" /> Phone Number (optional)
             </label>
             <Input
               value={phoneNumber}
@@ -67,7 +74,7 @@ export function SubmitReportDialog({ sessionId, onCancel }: SubmitReportDialogPr
             />
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-2 pt-2 sm:flex-row">
             <Button
               variant="outline"
               onClick={onCancel}
