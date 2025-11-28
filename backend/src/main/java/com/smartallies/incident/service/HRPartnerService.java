@@ -2,6 +2,8 @@ package com.smartallies.incident.service;
 
 import com.smartallies.incident.dto.ConnectHRResponse;
 import com.smartallies.incident.dto.HRChatResponse;
+import com.smartallies.incident.dto.IncidentReportResponse;
+import com.smartallies.incident.dto.SubmitReportRequest;
 import com.smartallies.incident.model.ConversationContext;
 import com.smartallies.incident.model.HRSession;
 import com.smartallies.incident.model.WorkflowState;
@@ -27,6 +29,7 @@ public class HRPartnerService {
     private final ConversationContextService contextService;
     private final ChatClient.Builder chatClientBuilder;
     private final LlmService llmService;
+    private final IncidentReportService incidentReportService;
 
     private static final List<HRPartner> HR_PARTNERS = List.of(
             new HRPartner("Sarah Mitchell", "https://i.pravatar.cc/150?img=1"),
@@ -161,27 +164,42 @@ public class HRPartnerService {
     }
 
     private boolean detectConversationConclusion(String sessionId, List<String> history, String hrResponse) {
-        if (history.size() < 1) {
+        if (history.size() < 4) {
             return false;
         }
 
-        String conversationContext = String.join("\n", history.subList(Math.max(0, history.size() - 6), history.size()));
+        String lastUserMessage = "";
+        for (int i = history.size() - 1; i >= 0; i--) {
+            if (history.get(i).startsWith("User: ")) {
+                lastUserMessage = history.get(i).substring(6).toLowerCase().trim();
+                break;
+            }
+        }
+
+        String conversationContext = String.join("\n", history.subList(Math.max(0, history.size() - 8), history.size()));
         
         String detectionPrompt = String.format(
-                "Analyze this HR conversation to determine if it has naturally concluded.\n\n" +
-                "Conversation:\n%s\n\n" +
-                "HR's latest response:\n%s\n\n" +
-                "Has the HR partner:\n" +
-                "- Gathered sufficient information about the incident?\n" +
-                "- Indicated they will create a ticket or take next steps?\n" +
-                "- Provided a natural closing statement?\n" +
-                "- Thanked the user or offered final support?\n\n" +
-                "Respond in JSON format:\n" +
+                "You are analyzing a conversation between an HR partner and an employee to detect if it should end.\n\n" +
+                "Recent conversation:\n%s\n\n" +
+                "The user's last message was: \"%s\"\n" +
+                "The HR partner just responded: \"%s\"\n\n" +
+                "Return true (concluded) if ANY of these apply:\n" +
+                "1. User expresses closure: 'thank you', 'thanks', 'bye', 'goodbye', 'that's all', 'that's everything', 'I'm done'\n" +
+                "2. User confirms no more to add: 'nothing else', 'no more', 'that's it', 'all good'\n" +
+                "3. HR has indicated ticket creation/next steps AND user acknowledged it positively\n" +
+                "4. Conversation has 8+ exchanges and HR gave a closing statement\n" +
+                "5. User gives very short positive response to HR's closing ('ok', 'yes', 'sure', 'got it')\n\n" +
+                "Return false if:\n" +
+                "- User is still providing information\n" +
+                "- User asked a question\n" +
+                "- Conversation just started (< 4 exchanges)\n\n" +
+                "Respond ONLY with valid JSON:\n" +
                 "{\n" +
-                "  \"concluded\": true or false,\n" +
-                "  \"reasoning\": \"brief explanation\"\n" +
+                "  \"concluded\": true,\n" +
+                "  \"reasoning\": \"User said 'thanks' indicating closure\"\n" +
                 "}",
                 conversationContext,
+                lastUserMessage,
                 hrResponse
         );
 
@@ -191,21 +209,26 @@ public class HRPartnerService {
             boolean concluded = result.get("concluded").asBoolean();
             String reasoning = result.get("reasoning").asText();
             
-            log.info("Conversation conclusion detection for session {}: {} - {}", 
+            log.info("Conversation conclusion for session {}: {} - {}", 
                     sessionId, concluded, reasoning);
             
             return concluded;
         } catch (Exception e) {
             log.error("Failed to detect conversation conclusion, using fallback", e);
-            return history.size() >= 10;
+            return history.size() >= 12;
         }
     }
 
     private HRChatResponse endHRSession(String sessionId, List<String> history) {
         HRSession session = hrSessions.get(sessionId);
         ConversationContext context = contextService.getContext(sessionId);
-        
-        String ticketId = "TKT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        SubmitReportRequest request = SubmitReportRequest.builder()
+                .sessionId(sessionId)
+                .submittedBy("Anonymous Employee")
+                .anonymous(true)
+                .build();
+        IncidentReportResponse response = incidentReportService.submitReport(request);
+        String ticketId = response.getReportId();
         session.setActive(false);
         session.setEndedAt(LocalDateTime.now());
         session.setTicketId(ticketId);

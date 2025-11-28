@@ -34,6 +34,7 @@ export function HRChatInterface({
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
+  const [ticketId, setTicketId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -80,9 +81,7 @@ export function HRChatInterface({
 
       if (response.sessionEnded && response.ticketId) {
         setSessionEnded(true);
-        setTimeout(() => {
-          navigate(`/report/${response.ticketId}`);
-        }, 3000);
+        setTicketId(response.ticketId);
       }
     } catch (error) {
       console.error('Failed to send HR message:', error);
@@ -195,11 +194,25 @@ export function HRChatInterface({
               <div ref={messagesEndRef} />
             </div>
 
-            {sessionEnded && (
-              <div className="bg-green-50/90 border-t border-green-200 p-4 backdrop-blur">
+            {sessionEnded && ticketId && (
+              <div className="bg-green-50/90 border-t border-green-200 p-4 backdrop-blur space-y-3">
                 <p className="text-green-800 text-center font-medium">
-                  Session ended. Redirecting to your ticket...
+                  Your conversation has ended. A ticket has been created for your incident.
                 </p>
+                <div className="flex gap-3 justify-center">
+                  <Button
+                    onClick={() => navigate(`/report/${ticketId}`)}
+                    className="shadow-lg"
+                  >
+                    View Ticket
+                  </Button>
+                  <Button
+                    onClick={() => navigate('/')}
+                    variant="outline"
+                  >
+                    Start New Chat
+                  </Button>
+                </div>
               </div>
             )}
 
