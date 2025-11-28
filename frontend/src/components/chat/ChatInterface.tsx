@@ -11,6 +11,15 @@ import { IncidentType, WorkflowState } from '@/types/incident.types';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { apiService } from '@/services/api.service';
 import type { HRSession } from '@/types/hr.types';
 import type { SamaritanSession } from '@/types/samaritan.types';
@@ -29,6 +38,7 @@ export function ChatInterface() {
   const [isConnectingHR, setIsConnectingHR] = useState(false);
   const [samaritanSession, setSamaritanSession] = useState<SamaritanSession | null>(null);
   const [isConnectingSamaritan, setIsConnectingSamaritan] = useState(false);
+  const [showSamaritanAlert, setShowSamaritanAlert] = useState(false);
   const [_latestFloorSelection, setLatestFloorSelection] = useState<FloorPlanSelection | null>(null);
   const [_facilityDetails, setFacilityDetails] = useState('');
   const [_facilityImage, setFacilityImage] = useState<File | null>(null);
@@ -66,6 +76,7 @@ export function ChatInterface() {
 
   const connectToSamaritan = async () => {
     setIsConnectingSamaritan(true);
+    setShowSamaritanAlert(false);
     try {
       const response = await apiService.connectToSamaritan({ sessionId });
       setSamaritanSession({
@@ -83,10 +94,10 @@ export function ChatInterface() {
   };
 
   useEffect(() => {
-    if (currentResponse?.metadata?.connectToSamaritan && !samaritanSession && !isConnectingSamaritan) {
-      connectToSamaritan();
+    if (currentResponse?.metadata?.connectToSamaritan && !samaritanSession && !isConnectingSamaritan && !showSamaritanAlert) {
+      setShowSamaritanAlert(true);
     }
-  }, [currentResponse?.metadata?.connectToSamaritan]);
+  }, [currentResponse?.metadata?.connectToSamaritan, samaritanSession, isConnectingSamaritan, showSamaritanAlert]);
 
   const handleLocationSelect = (selection: FloorPlanSelection) => {
     const location = `Floor plan location: ${selection.floorLabel}, X: ${selection.x.toFixed(1)}%, Y: ${selection.y.toFixed(1)}%`;
@@ -417,6 +428,22 @@ export function ChatInterface() {
             <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
           </div>
         </div>
+
+        <AlertDialog open={showSamaritanAlert} onOpenChange={setShowSamaritanAlert}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Emergency First Aid Responder Available</AlertDialogTitle>
+              <AlertDialogDescription>
+                A trained first aid responder (Samaritan) is ready to assist you. They will guide you through the emergency situation via chat. Would you like to connect now?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={connectToSamaritan}>
+                Connect to First Aid Responder
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

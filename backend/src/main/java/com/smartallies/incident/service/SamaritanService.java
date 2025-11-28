@@ -158,7 +158,7 @@ public class SamaritanService {
     }
 
     private boolean detectEmergencyResolution(String sessionId, List<String> history, String samaritanResponse) {
-        if (history.size() < 6) {
+        if (history.size() < 1) {
             return false;
         }
 
