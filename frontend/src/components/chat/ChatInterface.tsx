@@ -245,41 +245,76 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="relative h-full flex flex-col overflow-hidden">
+    <div className="relative min-h-screen flex flex-col overflow-hidden bg-gradient-to-br from-white via-orange-50/40 to-white">
       <div className="pointer-events-none absolute inset-0 opacity-80">
-        <div className="absolute -left-16 -top-16 h-64 w-64 rounded-full bg-orange-200 blur-3xl" />
-        <div className="absolute right-0 top-1/4 h-72 w-72 rounded-full bg-orange-100 blur-3xl" />
-        <div className="absolute -bottom-24 left-1/3 h-80 w-80 rounded-full bg-orange-50 blur-3xl" />
+        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-orange-200 blur-3xl" />
+        <div className="absolute right-4 top-1/4 h-72 w-72 rounded-full bg-orange-100 blur-3xl" />
+        <div className="absolute -bottom-32 left-1/3 h-96 w-96 rounded-full bg-orange-50 blur-3xl" />
+        <div className="absolute inset-x-0 top-1/3 mx-auto h-[520px] max-w-4xl bg-gradient-to-br from-orange-200/30 via-white/40 to-orange-100/30 blur-3xl rounded-full" />
       </div>
 
-      <div className="relative z-10 flex flex-col h-screen max-w-6xl mx-auto w-full">
-        <header className="sticky top-0 z-20 flex items-center border-b border-white/60 bg-white/80 px-4 sm:px-5 py-3 sm:py-4 shadow-lg backdrop-blur-md sm:mx-4 sm:mt-4 sm:rounded-2xl sm:border flex-shrink-0">
-          <button 
+      <div className="relative z-10 flex flex-col min-h-screen max-w-6xl mx-auto w-full px-4 sm:px-6">
+        <header className="sticky top-0 z-30 flex items-center justify-between border border-white/70 bg-white/85 px-4 sm:px-6 py-3 sm:py-4 shadow-xl backdrop-blur-2xl rounded-2xl mt-4">
+          <button
             onClick={() => window.location.href = '/'}
-            className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-3 hover:opacity-90 transition-opacity"
           >
-            <img src="/images/logo/SQ.svg" alt="SmartAllies logo" className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0" />
-            <h1 className="text-base sm:text-xl font-semibold text-gray-900 whitespace-nowrap">SmartAlly</h1>
+            <img src="/images/logo/SQ.svg" alt="SmartAllies logo" className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 drop-shadow-lg" />
+            <div className="text-left">
+              <p className="text-xs uppercase tracking-[0.2em] text-orange-500/80 font-semibold">smart safety</p>
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900">SmartAlly Concierge</h1>
+            </div>
           </button>
+          <div className="hidden sm:flex items-center gap-2 text-sm text-gray-700 bg-orange-50/70 border border-orange-100 px-3 py-1.5 rounded-full shadow-inner">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-60 animate-ping" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
+            </span>
+            Live assistance ready
+          </div>
         </header>
 
-        <div className="flex-1 flex flex-col min-h-0 sm:px-4 overflow-y-auto pb-2 pt-20 sm:pt-0">
-          <Card className="flex-1 flex flex-col overflow-hidden border-0 sm:border sm:border-orange-100/70 shadow-none sm:shadow-2xl rounded-none sm:rounded-2xl mt-2 sm:mt-4">
-            <div className="h-1 w-full bg-gradient-to-r from-primary via-orange-400 to-orange-300" />
+        <div className="mt-4 sm:mt-6 grid gap-4 sm:gap-6">
+          <div className="grid sm:grid-cols-3 gap-3">
+            <div className="col-span-2 bg-white/80 backdrop-blur-xl border border-orange-100 rounded-3xl shadow-[0_25px_80px_-45px_rgba(249,115,22,0.65)] px-4 sm:px-6 py-4 sm:py-6">
+              <div className="flex flex-wrap gap-3 items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-orange-500/80 font-semibold">secure session</p>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Chat with confidence</h2>
+                  <p className="text-sm sm:text-base text-gray-600 mt-1">Encrypted updates, human-like guidance, and rapid escalation when you need it.</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 text-white text-xs sm:text-sm font-semibold px-3 py-1.5 shadow-lg">24/7 coverage</span>
+                  <span className="inline-flex items-center gap-2 rounded-full border border-orange-200 text-orange-700 bg-white/80 text-xs sm:text-sm font-semibold px-3 py-1.5 shadow-inner">Mobile-first</span>
+                  <span className="inline-flex items-center gap-2 rounded-full border border-orange-200 text-orange-700 bg-white/80 text-xs sm:text-sm font-semibold px-3 py-1.5 shadow-inner">Empathetic AI</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-orange-500 to-orange-400 text-white rounded-3xl shadow-[0_25px_80px_-35px_rgba(249,115,22,0.9)] px-4 sm:px-5 py-4 sm:py-6 border border-white/20">
+              <p className="text-xs uppercase tracking-[0.2em] text-white/80 font-semibold">session id</p>
+              <p className="text-lg sm:text-xl font-bold mt-1 break-all">{sessionId}</p>
+              <p className="text-sm text-white/80 mt-2">Use this if you need to reconnect or share context with responders.</p>
+            </div>
+          </div>
+
+          <Card className="flex-1 flex flex-col overflow-hidden border border-orange-100/70 shadow-[0_30px_100px_-60px_rgba(0,0,0,0.45)] rounded-3xl bg-white/90 backdrop-blur-xl">
+            <div className="h-1 w-full bg-gradient-to-r from-primary via-orange-400 to-orange-300 rounded-full" />
             <MessageList messages={messages} />
 
             {showFloorPlan ? (
-              <div className="p-3 sm:p-6 border-t border-orange-100/70 bg-white/60 backdrop-blur">
+              <div className="p-4 sm:p-6 border-t border-orange-100/80 bg-white/80 backdrop-blur-xl">
                 <FloorPlanSelector onLocationSelect={handleLocationSelect} />
               </div>
             ) : null}
 
             {shouldShowActions && (
-              <ActionButtons
-                response={currentResponse}
-                onActionClick={handleActionClick}
-                isLoading={isLoading || isConnectingHR}
-              />
+              <div className="border-t border-orange-100/70 bg-gradient-to-r from-white via-orange-50/60 to-white px-3 sm:px-6 py-4 sm:py-6">
+                <ActionButtons
+                  response={currentResponse}
+                  onActionClick={handleActionClick}
+                  isLoading={isLoading || isConnectingHR}
+                />
+              </div>
             )}
 
             {showHROptions ? (
@@ -308,7 +343,7 @@ export function ChatInterface() {
             ) : null}
 
             {canSubmit && !submissionComplete && (
-              <div className="border-t border-orange-100/70 p-3 sm:p-6 bg-white/70 backdrop-blur space-y-3 sm:space-y-4">
+              <div className="border-t border-orange-100/70 p-3 sm:p-6 bg-white/80 backdrop-blur-xl space-y-3 sm:space-y-4">
                 <div className="flex gap-2 sm:gap-3 flex-col sm:flex-row justify-center">
                   <Button variant="outline" onClick={handleCancel} className="w-full sm:w-auto">
                     Cancel
