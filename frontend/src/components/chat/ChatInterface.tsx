@@ -36,26 +36,31 @@ export function ChatInterface() {
     (currentResponse?.incidentType === IncidentType.HUMAN ||
       currentResponse?.incidentType === IncidentType.FACILITY);
 
+  const shouldShowActions =
+    !!currentResponse?.suggestedActions?.length && !canSubmit;
+
   return (
-    <div className="h-screen flex flex-col max-w-4xl mx-auto">
+    <div className="min-h-screen flex flex-col max-w-4xl mx-auto">
       <header className="bg-primary text-white p-4 shadow-md">
         <h1 className="text-xl font-semibold">SmartAllies Incident Reporting</h1>
       </header>
 
-      <Card className="flex-1 flex flex-col m-4 overflow-hidden">
+      <Card className="flex-1 flex flex-col m-4">
         <MessageList messages={messages} />
 
         {showFloorPlan ? (
-          <div className="p-4 border-t">
+          <div className="p-4 border-t overflow-auto">
             <FloorPlanSelector onLocationSelect={handleLocationSelect} />
           </div>
         ) : null}
 
-        <ActionButtons
-          response={currentResponse}
-          onActionClick={handleActionClick}
-          isLoading={isLoading}
-        />
+        {shouldShowActions && (
+          <ActionButtons
+            response={currentResponse}
+            onActionClick={handleActionClick}
+            isLoading={isLoading}
+          />
+        )}
 
         {canSubmit && (
           <div className="border-t p-4 bg-gray-50">

@@ -21,6 +21,11 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
     if (!message.trim() && !selectedImage) return;
 
     let imageUrl: string | undefined;
+    let content = message.trim();
+
+    if (!content && selectedImage) {
+      content = 'Image attached.';
+    }
 
     if (selectedImage) {
       try {
@@ -30,7 +35,7 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
       }
     }
 
-    onSendMessage(message.trim(), imageUrl);
+    onSendMessage(content, imageUrl);
     setMessage('');
     setSelectedImage(null);
     setImagePreview(null);
