@@ -32,16 +32,16 @@ const tickets: ResponderTicket[] = [
     category: 'Human Incident',
     priority: 'High',
     status: 'In Progress',
-    reporter: 'Marie (HR partner)',
-    victim: 'Anna',
-    assignedResponder: 'Responder #1',
+    reporter: 'David (HR partner)',
+    victim: 'Anna R.',
+    assignedResponder: 'John Allen',
     summary: 'Anna reported uncomfortable comments about her outfit in the canteen. Immediate follow-up is required.',
     details: [
       'Meet with Anna to clarify what was said, who was involved, and identify the culprit.',
       'Review any nearby CCTV availability and speak with witnesses who were present.',
       'Coordinate with HR for guidance on confidentiality and next steps.',
     ],
-    location: 'Lausanne HQ – Ground-floor canteen',
+    location: 'Gland HQ – Ground-floor canteen',
     image: '/images/responder/hr-marie.png',
     avatar: '/images/responder/hr-marie.png',
   },
@@ -52,7 +52,7 @@ const tickets: ResponderTicket[] = [
     priority: 'Medium',
     status: 'To Do',
     reporter: 'Anonymous',
-    assignedResponder: 'Responder #1',
+    assignedResponder: 'John Allen',
     summary: 'Leaking crack reported on toilet tank near stairwell restroom. Needs inspection and containment.',
     details: [
       'Inspect the crack and place a temporary out-of-order sign if water leakage persists.',
@@ -101,7 +101,7 @@ export function ResponderPage() {
             <img src="/images/logo/SQ.svg" alt="Swissquote logo" className="h-12 w-12" />
             <div className="flex items-center gap-3 rounded-full border border-white/70 bg-white/70 px-3 py-2 shadow-lg">
               <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-400 to-primary flex items-center justify-center text-white font-semibold">
-                R1
+                JA
               </div>
               <div className="text-right">
                 <p className="text-sm font-semibold text-gray-900">Logged in</p>
