@@ -85,7 +85,7 @@ export function FloorPlanSelector({ onLocationSelect }: FloorPlanSelectorProps) 
           className="relative w-full max-h-[500px] bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg cursor-crosshair hover:bg-gray-50 transition-colors overflow-hidden aspect-[4/3]"
           style={{
             backgroundImage: `url('${FLOOR_IMAGES[selectedFloor]}')`,
-            backgroundSize: 'contain',
+            backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
           }}

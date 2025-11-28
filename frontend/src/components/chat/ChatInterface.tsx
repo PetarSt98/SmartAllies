@@ -428,15 +428,25 @@ export function ChatInterface() {
         </div>
 
         <AlertDialog open={showSamaritanAlert} onOpenChange={setShowSamaritanAlert}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Emergency First Aid Responder Available</AlertDialogTitle>
-              <AlertDialogDescription>
+          <AlertDialogContent className="rounded-3xl border-2 border-orange-200 bg-gradient-to-br from-white to-orange-50 shadow-2xl">
+            <AlertDialogHeader className="space-y-3">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <AlertDialogTitle className="text-xl font-bold text-center text-gray-900">
+                Emergency First Aid Responder Available
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-base text-center text-gray-700 leading-relaxed">
                 A trained first aid responder (Samaritan) is ready to assist you. They will guide you through the emergency situation via chat. Would you like to connect now?
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogAction onClick={connectToSamaritan}>
+            <AlertDialogFooter className="mt-2">
+              <AlertDialogAction 
+                onClick={connectToSamaritan}
+                className="w-full sm:w-auto bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all"
+              >
                 Connect to First Aid Responder
               </AlertDialogAction>
             </AlertDialogFooter>
