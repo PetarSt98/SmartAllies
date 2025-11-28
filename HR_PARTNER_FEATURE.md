@@ -442,3 +442,63 @@ Bot: Would you like to share more details or connect to HR?
 - ✅ Context maintained throughout
 
 **Built successfully!** ✅
+
+---
+
+## ✅ FIXED: "Share more details" Now Returns to Collecting Details State
+
+### Problem
+When user clicked "Share more details", the system was going directly to `REPORT_READY` state instead of allowing them to continue adding information.
+
+### Solution
+
+**Added:**
+1. ✅ `hrDecisionMade` flag in `ConversationContext` to track if user has made HR decision
+2. ✅ When "Share more details" is clicked → goes to `COLLECTING_DETAILS` state
+3. ✅ Sets `hrDecisionMade = true` to prevent asking again
+4. ✅ Provides suggested actions: "I'm done sharing" | "That's all"
+
+**Flow Now:**
+
+```
+User: [Reports human incident]
+Bot: [Collects who/what/when/where]
+Bot: "Would you like to share more details OR connect to HR?"
+
+Option A: "Share more details" 
+  ↓
+  State: COLLECTING_DETAILS
+  Bot: "Please share any additional details..."
+  [User shares more info]
+  Bot: "Thank you. Is there anything else?"
+  User: "That's all"
+  ↓
+  State: REPORT_READY
+  Bot: "Here's a summary... Submit?"
+  
+Option B: "Connect to HR Partner"
+  ↓
+  State: HR_CONNECTED
+  [HR chat begins]
+```
+
+**Key Logic:**
+```java
+if (allFieldsCollected) {
+    // Only ask about HR if decision hasn't been made yet
+    if (context.getIncidentType() == IncidentType.HUMAN 
+        && !context.isHrDecisionMade()) {
+        → AWAITING_HR_DECISION
+    }
+    // If decision already made, go to summary
+    → REPORT_READY
+}
+```
+
+**Benefits:**
+- ✅ User can add more context after initial details
+- ✅ No infinite loop asking about HR connection
+- ✅ Clear workflow: decide once, then either share more or connect
+- ✅ Natural conversation flow
+
+**Compiled successfully!** ✅

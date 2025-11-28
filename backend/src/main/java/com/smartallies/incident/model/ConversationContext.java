@@ -21,6 +21,7 @@ public class ConversationContext {
     private String initialMessage;
     private String imageUrl;
     private Double classificationConfidence;
+    private boolean hrDecisionMade;
     
     @Builder.Default
     private Map<String, String> collectedFields = new HashMap<>();

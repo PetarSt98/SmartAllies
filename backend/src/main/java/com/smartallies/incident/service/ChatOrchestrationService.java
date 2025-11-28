@@ -221,6 +221,7 @@ public class ChatOrchestrationService {
         
         if (userResponse.contains("connect") || userResponse.contains("hr")) {
             context.setWorkflowState(WorkflowState.HR_CONNECTED);
+            context.setHrDecisionMade(true);
             contextService.updateContext(context);
             
             return ChatResponse.builder()
@@ -229,8 +230,21 @@ public class ChatOrchestrationService {
                     .workflowState(context.getWorkflowState())
                     .metadata(Map.of("connectToHR", true))
                     .build();
+        } else if (userResponse.contains("share") || userResponse.contains("more") || userResponse.contains("details")) {
+            context.setWorkflowState(WorkflowState.COLLECTING_DETAILS);
+            context.setHrDecisionMade(true);
+            contextService.updateContext(context);
+            
+            return ChatResponse.builder()
+                    .message("Of course. Please share any additional details you'd like to include about the incident. " +
+                            "This could be more context, specific examples, or anything else you think is important. " +
+                            "When you're done, let me know.")
+                    .incidentType(context.getIncidentType())
+                    .workflowState(context.getWorkflowState())
+                    .build();
         } else {
             context.setWorkflowState(WorkflowState.REPORT_READY);
+            context.setHrDecisionMade(true);
             contextService.updateContext(context);
             
             String summaryPrompt = PromptTemplates.buildReportSummaryPrompt(
@@ -279,7 +293,7 @@ public class ChatOrchestrationService {
         boolean allFieldsCollected = Stream.of("what", "where").allMatch(context::hasField);
         
         if (allFieldsCollected) {
-            if (context.getIncidentType() == IncidentType.HUMAN) {
+            if (context.getIncidentType() == IncidentType.HUMAN && !context.isHrDecisionMade()) {
                 context.setWorkflowState(WorkflowState.AWAITING_HR_DECISION);
                 contextService.updateContext(context);
                 

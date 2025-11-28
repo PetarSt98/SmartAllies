@@ -32,7 +32,8 @@ public class PromptTemplates {
             Use an empathetic, calm, and understanding tone at all times.
             
             Current conversation context:
-            Initial incident: {initialMessage}
+            Initial incident message: {initialMessage}
+            User's latest message: {userMessage}
             
             The user needs to provide these details:
             - What: Detailed description of what happened
@@ -42,13 +43,13 @@ public class PromptTemplates {
             
             Already collected fields: {collectedFields}
             
-            User's latest message: {userMessage}
-            
-            Extract any information from the user's previous messages that fills in the missing fields.
+            Extract information from BOTH the initial message AND the latest message to fill in missing fields.
             Then respond with helpful guidance to collect any mandatory remaining information.
             Never pressure the user, but guide them clearly and compassionately.
             
-            Respond ONLY with valid JSON:
+            Respond ONLY with valid JSON. CRITICAL: Ensure ALL commas between object properties are present.
+            
+            Format (check commas carefully):
             {
               "extractedFields": {
                 "what": "extracted value or null",
@@ -57,8 +58,10 @@ public class PromptTemplates {
                 "who": "extracted value or null"
               },
               "message": "Your empathetic response asking for missing information",
-              "allFieldsCollected": "true if and only if the mandatory fields (what, when, where) are all provided; otherwise false.",
+              "allFieldsCollected": true
             }
+            
+            Remember: Each line in extractedFields needs a comma EXCEPT the last property "who".
             """;
 
     private static final String HUMAN_INCIDENT_COLLECTING_DETAILS_PROMPT = """
@@ -81,7 +84,8 @@ public class PromptTemplates {
             You are an assistant helping report a facility incident.
             
             Current conversation context:
-            Initial incident: {initialMessage}
+            Initial incident message: {initialMessage}
+            User's latest message: {userMessage}
             
             The user needs to provide these mandatory details:
             - What: Detailed description of the facility issue
@@ -90,23 +94,27 @@ public class PromptTemplates {
             
             Already collected fields: {collectedFields}
             
-            User's latest message: {userMessage}
+            Extract information from BOTH the initial message AND the latest message to fill in missing fields.
             
-            Extract any information from the user's message that fills in the missing fields.
+            CRITICAL: Respond with valid JSON. Ensure commas are between ALL properties.
             
-            Respond ONLY with valid JSON:
+            Format:
             {
               "extractedFields": {
                 "what": "extracted value or null",
                 "where": "extracted value or null"
               },
               "message": "Your response asking for missing information",
-              "allFieldsCollected": true or false
+              "allFieldsCollected": true
             }
             """;
 
     private static final String EMERGENCY_DETAILS_PROMPT = """
             You are responding to an EMERGENCY situation. Be direct and clear.
+            
+            Current conversation context:
+            Initial emergency report: {initialMessage}
+            User's latest message: {userMessage}
             
             Critical information needed:
             - Location: Where is the emergency? (MANDATORY)
@@ -115,11 +123,12 @@ public class PromptTemplates {
             
             Already collected fields: {collectedFields}
             
-            User's latest message: {userMessage}
+            Extract information from BOTH the initial message AND the latest message.
+            Guide the user urgently but calmly to provide missing critical information.
             
-            Extract information and guide the user urgently but calmly.
+            CRITICAL: Respond with valid JSON. Check commas between properties.
             
-            Respond ONLY with valid JSON:
+            Format:
             {
               "extractedFields": {
                 "location": "extracted value or null",
@@ -127,7 +136,7 @@ public class PromptTemplates {
                 "condition": "extracted value or null"
               },
               "message": "Your urgent but calm response",
-              "hasLocation": true or false
+              "hasLocation": true
             }
             """;
 

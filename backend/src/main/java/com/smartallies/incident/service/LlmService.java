@@ -73,9 +73,32 @@ public class LlmService {
             String jsonContent = extractJsonFromResponse(llmResponse);
             return objectMapper.readTree(jsonContent);
         } catch (Exception e) {
-            log.error("Failed to parse JSON response: {}", llmResponse, e);
-            throw new RuntimeException("Invalid JSON response format", e);
+            log.warn("Initial JSON parsing failed, attempting to repair: {}", e.getMessage());
+            try {
+                String repairedJson = repairCommonJsonIssues(extractJsonFromResponse(llmResponse));
+                log.debug("Repaired JSON: {}", repairedJson);
+                return objectMapper.readTree(repairedJson);
+            } catch (Exception e2) {
+                log.error("Failed to parse JSON response even after repair: {}", llmResponse, e2);
+                throw new RuntimeException("Invalid JSON response format", e2);
+            }
         }
+    }
+    
+    private String repairCommonJsonIssues(String json) {
+        String repaired = json;
+        
+        // Fix missing commas between object properties (common LLM mistake)
+        // Pattern: "value"\n    "nextKey" should be "value",\n    "nextKey"
+        repaired = repaired.replaceAll("\"\\s*\\n\\s*\"", "\",\\n    \"");
+        
+        // Fix missing commas after closing quotes before newline and next property
+        repaired = repaired.replaceAll("(\"[^\"]*\")\\s*\\n\\s*(\"[^\"]*\":)", "$1,\\n    $2");
+        
+        // Fix null without quotes to proper null
+        repaired = repaired.replaceAll(":\\s*null\\s*\\n", ": null,\\n");
+        
+        return repaired;
     }
 
     private String extractJsonFromResponse(String response) {
