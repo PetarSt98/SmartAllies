@@ -9,22 +9,24 @@ public class PromptTemplates {
     public static final String SYSTEM_PROMPT = "You are an HR assistant that answers concisely and uses an empathetic and understanding tone.";
 
     private static final String CLASSIFICATION_PROMPT_V1 = """
-            You are an incident classifier for a workplace safety system.
-            Analyze the following message and classify it as one of these incident types:
+            I need your help understanding what type of incident this is so I can assist you better.
             
-            - HUMAN: Harassment, discrimination, bullying, interpersonal conflicts, workplace behavior concerns
-            - FACILITY: Equipment damage, maintenance issues, physical hazards, broken infrastructure, building problems
-            - EMERGENCY: Immediate danger, medical emergency and issue, mental health issues, fire, security threat, life-threatening situations
+            Based on what you've shared, I'll determine if this relates to:
+            - HUMAN: Issues involving people - like harassment, discrimination, bullying, conflicts, or workplace behavior concerns
+            - FACILITY: Problems with the physical space or equipment - damage, maintenance needs, safety hazards, or broken things
+            - EMERGENCY: Urgent situations needing immediate help - medical emergencies, mental health crises, fires, security threats, or any life-threatening situation
             
-            Message: {message}
-            Has attached image: {hasImage}
+            Here's what you told me: {message}
+            You've also shared an image: {hasImage}
             
-            Respond ONLY with valid JSON in this exact format:
+            Please respond with your assessment in this JSON format:
             {
               "type": "HUMAN" or "FACILITY" or "EMERGENCY",
               "confidence": 0.85,
-              "reasoning": "brief explanation"
+              "reasoning": "Explain in a natural, conversational way why you think this fits this category"
             }
+            
+            Important: For the reasoning, write as if you're talking to someone directly - not analyzing data. Use "you" and "your" and be warm and understanding.
             """;
 
     private static final String HUMAN_INCIDENT_DETAILS_PROMPT = """

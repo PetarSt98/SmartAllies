@@ -121,7 +121,7 @@ public class ChatOrchestrationService {
         StringBuilder message = new StringBuilder();
         message.append("I'm here to support you through this. Here are some resources that might help:\n\n");
         resources.forEach(resource -> message.append("• ").append(resource).append("\n"));
-        message.append("\nWould you like me to help you draft an incident report?");
+        message.append("\nWould you like to read more about your rights first, or continue with reporting so we can take action together?");
         
         context.setWorkflowState(WorkflowState.AWAITING_REPORT_CONFIRMATION);
         contextService.updateContext(context);

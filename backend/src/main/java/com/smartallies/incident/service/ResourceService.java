@@ -17,11 +17,7 @@ public class ResourceService {
 
     static {
         INCIDENT_RESOURCES.put(IncidentType.HUMAN, List.of(
-                "Employee Assistance Program: https://company.com/eap",
-                "HR Confidential Hotline: +41 XX XXX XX XX",
-                "Mental Health Resources: https://company.com/mental-health",
-                "Anti-Harassment Policy: https://company.com/policies/harassment",
-                "Workplace Mediation Services: https://company.com/mediation"
+                "Code of Conduct: https://inside.swissquote.com/"
         ));
 
         INCIDENT_RESOURCES.put(IncidentType.FACILITY, List.of(

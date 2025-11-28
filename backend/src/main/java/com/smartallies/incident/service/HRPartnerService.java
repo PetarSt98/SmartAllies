@@ -4,6 +4,7 @@ import com.smartallies.incident.dto.ConnectHRResponse;
 import com.smartallies.incident.dto.HRChatResponse;
 import com.smartallies.incident.model.ConversationContext;
 import com.smartallies.incident.model.HRSession;
+import com.smartallies.incident.model.WorkflowState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -25,6 +26,7 @@ public class HRPartnerService {
     private final Map<String, List<String>> conversationHistory = new ConcurrentHashMap<>();
     private final ConversationContextService contextService;
     private final ChatClient.Builder chatClientBuilder;
+    private final LlmService llmService;
 
     private static final List<HRPartner> HR_PARTNERS = List.of(
             new HRPartner("Sarah Mitchell", "https://i.pravatar.cc/150?img=1"),
@@ -81,12 +83,14 @@ public class HRPartnerService {
         List<String> history = conversationHistory.get(sessionId);
         history.add("User: " + userMessage);
 
-        if (shouldEndConversation(userMessage, history.size())) {
-            return endHRSession(sessionId, history);
-        }
-
         String hrResponse = generateHRResponse(sessionId, userMessage, history);
         history.add("HR: " + hrResponse);
+
+        boolean shouldEnd = detectConversationConclusion(sessionId, history, hrResponse);
+        
+        if (shouldEnd) {
+            return endHRSession(sessionId, history);
+        }
 
         return HRChatResponse.builder()
                 .message(hrResponse)
@@ -113,7 +117,10 @@ public class HRPartnerService {
                 "- Offer support and next steps\n" +
                 "- Keep responses concise (2-3 sentences)\n" +
                 "- Maintain professional yet warm tone\n" +
-                "- After 4-5 exchanges, thank them and indicate you'll create a ticket\n\n" +
+                "- After gathering sufficient information (4-6 exchanges), naturally conclude by:\n" +
+                "  * Thanking them for sharing\n" +
+                "  * Indicating you've documented everything\n" +
+                "  * Mentioning next steps (ticket creation, follow-up)\n\n" +
                 "IMPORTANT: Only provide YOUR response as the HR partner. " +
                 "Do NOT generate or simulate the user's response. " +
                 "Do NOT include 'User:' in your output.\n\n" +
@@ -153,13 +160,59 @@ public class HRPartnerService {
                lower.contains("that's everything");
     }
 
+    private boolean detectConversationConclusion(String sessionId, List<String> history, String hrResponse) {
+        if (history.size() < 1) {
+            return false;
+        }
+
+        String conversationContext = String.join("\n", history.subList(Math.max(0, history.size() - 6), history.size()));
+        
+        String detectionPrompt = String.format(
+                "Analyze this HR conversation to determine if it has naturally concluded.\n\n" +
+                "Conversation:\n%s\n\n" +
+                "HR's latest response:\n%s\n\n" +
+                "Has the HR partner:\n" +
+                "- Gathered sufficient information about the incident?\n" +
+                "- Indicated they will create a ticket or take next steps?\n" +
+                "- Provided a natural closing statement?\n" +
+                "- Thanked the user or offered final support?\n\n" +
+                "Respond in JSON format:\n" +
+                "{\n" +
+                "  \"concluded\": true or false,\n" +
+                "  \"reasoning\": \"brief explanation\"\n" +
+                "}",
+                conversationContext,
+                hrResponse
+        );
+
+        try {
+            String llmResponse = llmService.generateResponse(detectionPrompt);
+            com.fasterxml.jackson.databind.JsonNode result = llmService.parseJsonResponse(llmResponse);
+            boolean concluded = result.get("concluded").asBoolean();
+            String reasoning = result.get("reasoning").asText();
+            
+            log.info("Conversation conclusion detection for session {}: {} - {}", 
+                    sessionId, concluded, reasoning);
+            
+            return concluded;
+        } catch (Exception e) {
+            log.error("Failed to detect conversation conclusion, using fallback", e);
+            return history.size() >= 10;
+        }
+    }
+
     private HRChatResponse endHRSession(String sessionId, List<String> history) {
         HRSession session = hrSessions.get(sessionId);
+        ConversationContext context = contextService.getContext(sessionId);
         
         String ticketId = "TKT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         session.setActive(false);
         session.setEndedAt(LocalDateTime.now());
         session.setTicketId(ticketId);
+
+        context.setWorkflowState(WorkflowState.REPORT_READY);
+        context.updateField("ticketId", ticketId);
+        contextService.updateContext(context);
 
         String closingMessage = String.format(
                 "Thank you for sharing this with me. I've documented everything you've told me. " +
