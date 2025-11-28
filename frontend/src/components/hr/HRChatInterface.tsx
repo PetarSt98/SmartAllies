@@ -128,10 +128,6 @@ export function HRChatInterface({
               <p className="text-sm text-gray-600">Confidential, human support</p>
             </div>
           </div>
-          <div className="hidden sm:flex items-center gap-2 rounded-full bg-orange-50 px-4 py-2 text-sm font-medium text-primary shadow-inner">
-            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Secure channel
-          </div>
         </header>
 
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">

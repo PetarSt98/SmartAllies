@@ -53,7 +53,7 @@ export function ReportPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative h-screen flex flex-col overflow-hidden">
       <div className="pointer-events-none absolute inset-0 opacity-80">
         <div className="absolute -left-10 -top-16 h-64 w-64 rounded-full bg-orange-200 blur-3xl" />
         <div className="absolute right-0 top-1/3 h-72 w-72 rounded-full bg-orange-100 blur-3xl" />
@@ -74,7 +74,7 @@ export function ReportPage() {
         </div>
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 py-10 space-y-6">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 py-10 space-y-6 flex-1 overflow-y-auto">
         <header className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/85 px-6 py-5 shadow-xl backdrop-blur-md">
           <div>
             <p className="text-sm uppercase tracking-wide text-primary font-semibold">Report ID: {report.reportId}</p>
