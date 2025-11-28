@@ -9,7 +9,7 @@ export function useChatWorkflow() {
       {
         id: '1',
         role: 'assistant',
-        content: "Hello! I'm here to help you report an incident. How can I assist you today?",
+        content: "Hello! How can I assist you today?",
         timestamp: new Date(),
       } as ChatMessage,
     ],

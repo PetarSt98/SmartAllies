@@ -66,8 +66,7 @@ public class ChatOrchestrationService {
         contextService.updateContext(context);
         
         String confirmationMessage = String.format(
-                "I understand this is a %s incident. %s\n\nIs this correct?",
-                classification.getType().toString().toLowerCase(),
+                "%s\n\nIs this correct?",
                 classification.getReasoning()
         );
         
