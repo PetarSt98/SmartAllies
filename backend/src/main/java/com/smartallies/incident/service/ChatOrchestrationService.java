@@ -31,7 +31,25 @@ public class ChatOrchestrationService {
 	public ChatResponse processMessage(ChatRequest request) {
 		log.info("Processing message for session: {}", request.getSessionId());
 
-    private ChatResponse handleInitialMessage(ConversationContext context, ChatRequest request) {
+
+		ConversationContext context = contextService.getOrCreateContext(request.getSessionId());
+
+		return switch (context.getWorkflowState()) {
+			case INITIAL -> handleInitialMessage(context, request);
+			case AWAITING_CLASSIFICATION_CONFIRMATION -> handleClassificationConfirmation(context, request);
+			case CLASSIFICATION_CONFIRMED -> handlePostClassificationActions(context, request);
+			case COLLECTING_DETAILS -> handleDetailsCollection(context, request);
+			case AWAITING_REPORT_CONFIRMATION -> handleReportConfirmation(context, request);
+			case AWAITING_HR_DECISION -> handleHRDecision(context, request);
+			case EMERGENCY_ACTIVE -> handleEmergencyFlow(context, request);
+			case REPORT_READY -> handleReportReady(context);
+			case ALERT_SENT -> handleAlertSent(context);
+			case COMPLETED -> handleCompleted(context);
+			default -> buildErrorResponse("Invalid workflow state");
+		};
+	}
+
+     private ChatResponse handleInitialMessage(ConversationContext context, ChatRequest request) {
         log.info("Handling initial message for session: {}", request.getSessionId());
         
         context.setInitialMessage(request.getMessage());
@@ -66,73 +84,6 @@ public class ChatOrchestrationService {
                 ))
                 .build();
     }
-
-		return switch (context.getWorkflowState()) {
-			case INITIAL -> handleInitialMessage(context, request);
-			case AWAITING_CLASSIFICATION_CONFIRMATION -> handleClassificationConfirmation(context, request);
-			case CLASSIFICATION_CONFIRMED -> handlePostClassificationActions(context, request);
-			case COLLECTING_DETAILS -> handleDetailsCollection(context, request);
-			case AWAITING_REPORT_CONFIRMATION -> handleReportConfirmation(context, request);
-			case AWAITING_HR_DECISION -> handleHRDecision(context, request);
-			case EMERGENCY_ACTIVE -> handleEmergencyFlow(context, request);
-			case REPORT_READY -> handleReportReady(context);
-			case ALERT_SENT -> handleAlertSent(context);
-			case COMPLETED -> handleCompleted(context);
-			default -> buildErrorResponse("Invalid workflow state");
-		};
-	}
-
-	private ChatResponse handleInitialMessage(ConversationContext context, ChatRequest request) {
-		log.info("Handling initial message for session: {}", request.getSessionId());
-
-		context.setInitialMessage(request.getMessage());
-		context.setImageUrl(request.getImageUrl());
-
-    private ChatResponse handleHumanIncidentStart(ConversationContext context) {
-        List<String> resources = resourceService.getResourcesForIncidentType(IncidentType.HUMAN);
-        
-        StringBuilder message = new StringBuilder();
-        message.append("I'm here to support you through this. Here are some resources that might help:\n\n");
-        resources.forEach(resource -> message.append("• ").append(resource).append("\n"));
-        message.append("\nWould you like to read more about your rights first, or continue with reporting so we can take action together?");
-        
-        context.setWorkflowState(WorkflowState.AWAITING_REPORT_CONFIRMATION);
-        contextService.updateContext(context);
-        
-        return ChatResponse.builder()
-                .message(message.toString())
-                .incidentType(context.getIncidentType())
-                .workflowState(context.getWorkflowState())
-                .resources(resources)
-                .suggestedActions(Arrays.asList("Yes, help me report this", "No, thank you"))
-                .build();
-    }
-
-		String llmResponse = llmService.generateResponse(classificationPrompt);
-		IncidentClassification classification = llmService.parseClassificationResponse(llmResponse);
-
-		context.setIncidentType(classification.getType());
-		context.setClassificationConfidence(classification.getConfidence());
-		context.setWorkflowState(WorkflowState.AWAITING_CLASSIFICATION_CONFIRMATION);
-		contextService.updateContext(context);
-
-		String confirmationMessage = String.format(
-				"I understand this is a %s incident. %s\n\nIs this correct?",
-				classification.getType().toString().toLowerCase(),
-				classification.getReasoning()
-		);
-
-		return ChatResponse.builder()
-				.message(confirmationMessage)
-				.incidentType(classification.getType())
-				.workflowState(context.getWorkflowState())
-				.suggestedActions(Arrays.asList("Yes", "No"))
-				.metadata(Map.of(
-						"confidence", classification.getConfidence(),
-						"reasoning", classification.getReasoning()
-				))
-				.build();
-	}
 
 	private ChatResponse handleClassificationConfirmation(ConversationContext context, ChatRequest request) {
 		log.info("Handling classification confirmation for session: {}", request.getSessionId());
