@@ -113,8 +113,8 @@ export function HRChatInterface({
         <div className="absolute bottom-0 left-1/4 h-72 w-72 rounded-full bg-orange-50 blur-3xl" />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-6 flex flex-col gap-6 h-full overflow-y-auto">
-        <header className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/80 px-5 py-4 shadow-xl backdrop-blur-md">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-6 flex flex-col gap-6 h-full">
+        <header className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/80 px-5 py-4 shadow-xl backdrop-blur-md flex-shrink-0">
           <div className="flex items-center gap-3">
             {hrSession.hrPartnerImage && (
               <img
@@ -134,10 +134,10 @@ export function HRChatInterface({
           </div>
         </header>
 
-        <div className="flex-1 flex flex-col">
-          <Card className="flex-1 flex flex-col overflow-hidden border-orange-100/70 shadow-2xl">
-            <div className="h-1 w-full bg-gradient-to-r from-primary via-orange-400 to-orange-300" />
-            <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-white/85 via-white/70 to-transparent space-y-4">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <Card className="flex flex-col h-full border-orange-100/70 shadow-2xl">
+            <div className="h-1 w-full bg-gradient-to-r from-primary via-orange-400 to-orange-300 flex-shrink-0" />
+            <div className="flex-1 overflow-y-auto p-6 pb-48 sm:pb-64 bg-gradient-to-b from-white/85 via-white/70 to-transparent space-y-4 min-h-0">
               {previousMessages.length > 0 && (
                 <>
                   <div className="mb-4 pb-4 border-b border-orange-100/80">
@@ -195,7 +195,7 @@ export function HRChatInterface({
             </div>
 
             {sessionEnded && ticketId && (
-              <div className="bg-green-50/90 border-t border-green-200 p-4 backdrop-blur space-y-3">
+              <div className="bg-green-50/90 border-t border-green-200 p-4 pb-48 sm:pb-8 backdrop-blur space-y-3 flex-shrink-0">
                 <p className="text-green-800 text-center font-medium">
                   Your conversation has ended. A ticket has been created for your incident.
                 </p>
@@ -215,8 +215,12 @@ export function HRChatInterface({
                 </div>
               </div>
             )}
+          </Card>
+        </div>
 
-            {!sessionEnded && (
+        {!sessionEnded && (
+          <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-safe flex-shrink-0">
+            <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md border-t border-orange-100/60 rounded-2xl shadow-lg pb-4 sm:pb-6">
               <div className="border-t border-orange-100/70 p-5 bg-white/80 backdrop-blur">
                 <div className="flex gap-3">
                   <Input
@@ -237,9 +241,9 @@ export function HRChatInterface({
                   </Button>
                 </div>
               </div>
-            )}
-          </Card>
-        </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -17,7 +17,7 @@ export function ActionButtons({
   }
 
   return (
-    <div className="border-t border-orange-100/70 p-5 pb-24 sm:pb-32 bg-white/60 backdrop-blur">
+    <div className="border-t border-orange-100/70 p-5 pb-24 sm:pb-8 bg-white/60 backdrop-blur">
       <div className="flex flex-wrap gap-3 justify-center pb-4">
         {response.suggestedActions.map((action) => (
           <Button

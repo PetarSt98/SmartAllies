@@ -157,20 +157,11 @@ public class ChatOrchestrationService {
 		contextService.updateContext(context);
 
 		String emergencyMessage = String.format("""
-						🚨 EMERGENCY PROTOCOL ACTIVATED 🚨
-						
-						Swiss Emergency Numbers:
-						• Police: %s
+						🚨 Swiss Emergency Numbers:🚨
 						• Ambulance: %s
-						• Fire: %s
-						• Company Samaritans: %s
-						
 						Please select the LOCATION of the emergency on the floor plan.
 						""",
-				emergencyConfig.getPoliceNumber(),
-				emergencyConfig.getAmbulanceNumber(),
-				emergencyConfig.getFireNumber(),
-				emergencyConfig.getSamaritanNumber()
+				emergencyConfig.getAmbulanceNumber()
 		);
 
 		return ChatResponse.builder()
