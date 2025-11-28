@@ -50,7 +50,7 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-t border-orange-100/70 p-3 sm:p-5 bg-white/80 backdrop-blur">
+    <form onSubmit={handleSubmit} className="mx-2 sm:mx-4 mt-2 border border-orange-100/70 p-3 sm:p-5 bg-white/90 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_-40px_rgba(0,0,0,0.4)]">
       {imagePreview && (
         <div className="mb-2 sm:mb-3 relative inline-block">
           <img
@@ -67,7 +67,7 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           </button>
         </div>
       )}
-      <div className="flex gap-2 sm:gap-3">
+      <div className="flex gap-2 sm:gap-3 items-center">
         <input
           ref={fileInputRef}
           type="file"
@@ -108,9 +108,9 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type your message..."
           disabled={isLoading}
-          className="flex-1 shadow-sm min-w-0"
+          className="flex-1 shadow-inner min-w-0 rounded-xl border-orange-100 bg-orange-50/50 focus-visible:ring-orange-300"
         />
-        <Button type="submit" disabled={isLoading || (!message.trim() && !selectedImage)} className="shadow-lg flex-shrink-0">
+        <Button type="submit" disabled={isLoading || (!message.trim() && !selectedImage)} className="shadow-lg flex-shrink-0 bg-gradient-to-r from-orange-500 to-orange-400 text-white border-none">
           <Send className="h-4 w-4" />
         </Button>
       </div>

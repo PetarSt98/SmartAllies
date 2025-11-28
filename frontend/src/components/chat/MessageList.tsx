@@ -15,7 +15,7 @@ export function MessageList({ messages }: MessageListProps) {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-20 space-y-3 sm:space-y-4 bg-gradient-to-b from-white/80 via-white/70 to-transparent">
+    <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-10 space-y-3 sm:space-y-4 bg-gradient-to-b from-white/85 via-white/75 to-orange-50/30 rounded-3xl sm:rounded-none">
       {messages.map((message) => (
         <div
           key={message.id}
@@ -26,7 +26,7 @@ export function MessageList({ messages }: MessageListProps) {
         >
           <div
             className={cn(
-              'max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 sm:px-5 py-2.5 sm:py-3 shadow-md border border-white/50 backdrop-blur-sm text-sm sm:text-base',
+              'max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 sm:px-5 py-2.5 sm:py-3 shadow-[0_18px_60px_-35px_rgba(0,0,0,0.45)] border border-white/60 backdrop-blur-sm text-sm sm:text-base transition-transform duration-200 hover:-translate-y-0.5',
               message.role === 'user'
                 ? 'bg-gradient-to-br from-primary to-orange-500 text-white shadow-lg'
                 : 'bg-white/90 text-gray-900'
@@ -77,7 +77,7 @@ export function MessageList({ messages }: MessageListProps) {
           </div>
         </div>
       ))}
-      <div ref={messagesEndRef} />
+      <div ref={messagesEndRef} className="pb-4 sm:pb-2" />
     </div>
   );
 }
