@@ -253,8 +253,8 @@ export function ChatInterface() {
         <div className="absolute inset-x-0 top-1/3 mx-auto h-[520px] max-w-4xl bg-gradient-to-br from-orange-200/30 via-white/40 to-orange-100/30 blur-3xl rounded-full" />
       </div>
 
-      <div className="relative z-10 flex flex-col min-h-screen max-w-6xl mx-auto w-full px-4 sm:px-6">
-        <header className="sticky top-0 z-30 flex items-center justify-between border border-white/70 bg-white/85 px-4 sm:px-6 py-3 sm:py-4 shadow-xl backdrop-blur-2xl rounded-2xl mt-4">
+      <div className="relative z-10 flex flex-col min-h-screen max-w-6xl mx-auto w-full px-4 sm:px-6 pt-4 pb-32">
+        <header className="sticky top-3 sm:top-5 z-30 flex items-center justify-between border border-white/70 bg-white/90 px-4 sm:px-6 py-3 sm:py-4 shadow-xl backdrop-blur-2xl rounded-2xl">
           <button
             onClick={() => window.location.href = '/'}
             className="flex items-center gap-3 hover:opacity-90 transition-opacity"
@@ -274,7 +274,7 @@ export function ChatInterface() {
           </div>
         </header>
 
-        <div className="mt-4 sm:mt-6 grid gap-4 sm:gap-6">
+        <div className="mt-6 sm:mt-8 grid gap-4 sm:gap-6">
           <div className="grid sm:grid-cols-3 gap-3">
             <div className="col-span-2 bg-white/80 backdrop-blur-xl border border-orange-100 rounded-3xl shadow-[0_25px_80px_-45px_rgba(249,115,22,0.65)] px-4 sm:px-6 py-4 sm:py-6">
               <div className="flex flex-wrap gap-3 items-center justify-between">
@@ -297,7 +297,7 @@ export function ChatInterface() {
             </div>
           </div>
 
-          <Card className="flex-1 flex flex-col overflow-hidden border border-orange-100/70 shadow-[0_30px_100px_-60px_rgba(0,0,0,0.45)] rounded-3xl bg-white/90 backdrop-blur-xl">
+          <Card className="flex flex-col min-h-[70vh] sm:min-h-[75vh] overflow-hidden border border-orange-100/70 shadow-[0_30px_100px_-60px_rgba(0,0,0,0.45)] rounded-3xl bg-white/90 backdrop-blur-xl">
             <div className="h-1 w-full bg-gradient-to-r from-primary via-orange-400 to-orange-300 rounded-full" />
             <MessageList messages={messages} />
 
@@ -454,14 +454,10 @@ export function ChatInterface() {
                 </div>
               </div>
             )}
-
+            <div className="border-t border-orange-100/70 bg-gradient-to-r from-white via-orange-50/50 to-white px-3 sm:px-6 pb-6 pt-4 sm:pt-6 sticky bottom-0 backdrop-blur-xl">
+              <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
+            </div>
           </Card>
-        </div>
-        
-        <div className="fixed bottom-0 left-0 right-0 z-20 sm:px-4 pb-safe flex-shrink-0">
-          <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md border-t border-white/60 sm:border sm:rounded-2xl shadow-lg pb-4 sm:pb-6">
-            <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
-          </div>
         </div>
 
         <AlertDialog open={showSamaritanAlert} onOpenChange={setShowSamaritanAlert}>

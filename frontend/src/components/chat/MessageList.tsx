@@ -77,7 +77,7 @@ export function MessageList({ messages }: MessageListProps) {
           </div>
         </div>
       ))}
-      <div ref={messagesEndRef} className="pb-28 sm:pb-16" />
+      <div ref={messagesEndRef} className="pb-4 sm:pb-2" />
     </div>
   );
 }
