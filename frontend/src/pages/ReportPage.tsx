@@ -1,12 +1,17 @@
+import { useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 export function ReportPage() {
-  const params = new URLSearchParams(window.location.search);
-  const sessionId = params.get('sessionId');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const sessionId = useMemo(() => new URLSearchParams(location.search).get('sessionId'), [location.search]);
 
   const handleStartNew = () => {
-    window.location.assign('/');
+    navigate('/', { replace: true });
   };
 
   return (
@@ -61,7 +66,7 @@ export function ReportPage() {
           <div className="flex flex-col gap-3 border-t border-orange-100/80 bg-orange-50/60 px-6 py-5 sm:flex-row sm:items-center sm:justify-end">
             <Button
               variant="outline"
-              onClick={() => window.history.back()}
+              onClick={() => navigate(-1)}
               className="border-orange-200 text-orange-700 hover:bg-orange-100/70"
             >
               Back to chat

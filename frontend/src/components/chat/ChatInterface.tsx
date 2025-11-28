@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useChatWorkflow } from '@/hooks/useChatWorkflow';
 import { MessageList } from './MessageList';
@@ -14,6 +15,7 @@ type SubmitIntent = 'submit' | 'anonymous' | null;
 
 export function ChatInterface() {
   const { messages, isLoading, currentResponse, sendMessage, sessionId } = useChatWorkflow();
+  const navigate = useNavigate();
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [submitIntent, setSubmitIntent] = useState<SubmitIntent>(null);
   const [fullName, setFullName] = useState('');
@@ -21,7 +23,7 @@ export function ChatInterface() {
 
   const redirectToReportPage = () => {
     const url = `/report?sessionId=${encodeURIComponent(sessionId)}`;
-    window.location.assign(url);
+    navigate(url);
   };
 
   const openSubmitDialog = (intent: SubmitIntent = 'submit') => {
