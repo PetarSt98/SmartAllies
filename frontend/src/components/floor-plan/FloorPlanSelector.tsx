@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, Compass } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { FloorPlanPin } from '@/types/incident.types';
 
 type Floor =
-  'minusOne'
+  | 'minusOne'
   | 'minusTwo'
   | 'minusThree'
   | 'ground'
@@ -63,12 +63,15 @@ export function FloorPlanSelector({ onLocationSelect }: FloorPlanSelectorProps) 
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full border-orange-100/90 shadow-orange-200/50">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MapPin className="h-5 w-5" />
-          Select Location on Floor Plan
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Compass className="h-5 w-5 text-primary" />
+          Pinpoint a location
         </CardTitle>
+        <p className="text-sm text-slate-500">
+          Choose the floor and tap on the plan to drop a pin. You can reset before confirming.
+        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-wrap gap-2">
@@ -77,6 +80,7 @@ export function FloorPlanSelector({ onLocationSelect }: FloorPlanSelectorProps) 
               key={floor}
               variant={selectedFloor === floor ? 'default' : 'outline'}
               onClick={() => handleFloorChange(floor)}
+              className="rounded-full px-4 py-2"
             >
               {FLOOR_LABELS[floor]}
             </Button>
@@ -85,7 +89,7 @@ export function FloorPlanSelector({ onLocationSelect }: FloorPlanSelectorProps) 
 
         <div
           onClick={handleClick}
-          className="relative w-full bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg cursor-crosshair hover:bg-gray-50 transition-colors overflow-hidden aspect-square"
+          className="relative w-full bg-gradient-to-br from-orange-50/70 to-white border-2 border-dashed border-orange-200 rounded-2xl cursor-crosshair hover:shadow-lg transition-all duration-200 overflow-hidden aspect-square"
           style={{
             backgroundImage: `url('${FLOOR_IMAGES[selectedFloor]}')`,
             backgroundSize: 'contain',
@@ -95,7 +99,7 @@ export function FloorPlanSelector({ onLocationSelect }: FloorPlanSelectorProps) 
         >
           {pin && (
             <div
-              className="absolute transform -translate-x-1/2 -translate-y-full"
+              className="absolute transform -translate-x-1/2 -translate-y-full drop-shadow-xl"
               style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
             >
               <MapPin className="h-8 w-8 text-primary fill-primary" />
@@ -104,8 +108,8 @@ export function FloorPlanSelector({ onLocationSelect }: FloorPlanSelectorProps) 
         </div>
 
         {pin && (
-          <div className="mt-4 flex justify-between items-center">
-            <p className="text-sm text-gray-600">
+          <div className="mt-2 flex flex-col gap-3 rounded-xl border border-orange-100/80 bg-orange-50/70 p-4 md:flex-row md:items-center md:justify-between">
+            <p className="text-sm text-slate-700">
               Location selected: X: {pin.x.toFixed(1)}%, Y: {pin.y.toFixed(1)}%
             </p>
             <div className="flex gap-2">

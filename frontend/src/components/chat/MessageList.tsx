@@ -7,7 +7,12 @@ interface MessageListProps {
 
 export function MessageList({ messages }: MessageListProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white/80 via-orange-50/40 to-white/60 px-6 py-5 space-y-4">
+      {messages.length === 0 ? (
+        <div className="flex h-full items-center justify-center text-sm text-slate-500 bg-white/70 border border-dashed border-orange-100/80 rounded-xl p-6">
+          The assistant will greet you here. Share details, attach images, or use quick actions to begin.
+        </div>
+      ) : null}
       {messages.map((message) => (
         <div
           key={message.id}
@@ -18,23 +23,28 @@ export function MessageList({ messages }: MessageListProps) {
         >
           <div
             className={cn(
-              'max-w-[80%] rounded-lg px-4 py-2',
+              'max-w-[80%] rounded-2xl px-5 py-3 shadow-md border',
               message.role === 'user'
-                ? 'bg-primary text-white'
-                : 'bg-gray-100 text-gray-900'
+                ? 'bg-gradient-to-r from-primary to-orange-500 text-white border-transparent'
+                : 'bg-white/90 border-orange-100 text-slate-900'
             )}
           >
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide mb-1 opacity-80">
+              <span>
+                {message.role === 'user' ? 'You' : 'SmartAllies Assistant'}
+              </span>
+              <span className="text-[10px]">
+                {message.timestamp.toLocaleTimeString()}
+              </span>
+            </div>
             {message.imageUrl && (
               <img
                 src={message.imageUrl}
                 alt="Attached"
-                className="mb-2 rounded max-w-full h-auto"
+                className="mb-3 rounded-lg max-w-full h-auto border border-orange-100/80"
               />
             )}
-            <p className="whitespace-pre-wrap">{message.content}</p>
-            <span className="text-xs opacity-70 mt-1 block">
-              {message.timestamp.toLocaleTimeString()}
-            </span>
+            <p className="whitespace-pre-wrap leading-relaxed text-sm">{message.content}</p>
           </div>
         </div>
       ))}

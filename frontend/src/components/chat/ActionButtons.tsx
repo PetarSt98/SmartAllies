@@ -17,7 +17,7 @@ export function ActionButtons({
   }
 
   return (
-    <div className="border-t p-4 bg-gray-50">
+    <div className="border-t border-orange-100/80 px-6 py-4 bg-white/80 backdrop-blur">
       <div className="flex flex-wrap gap-2 justify-center">
         {response.suggestedActions.map((action) => (
           <Button
@@ -25,6 +25,7 @@ export function ActionButtons({
             onClick={() => onActionClick(action)}
             disabled={isLoading}
             variant="outline"
+            className="rounded-full border-orange-200/80 px-4 py-2 text-sm font-semibold hover:bg-orange-100/60"
           >
             {action}
           </Button>
